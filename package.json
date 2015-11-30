@@ -1,0 +1,24 @@
+{
+  "name": "stremio-addons-client",
+  "version": "0.1.0",
+  "description": "An example client to the Stremio add-ons protocol, similar to Stremio's Discover",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/Ivshti/stremio-addons-client"
+  },
+  "keywords": [
+    "stremio",
+    "stremio-addons",
+    "client"
+  ],
+  "author": "Ivo Georgiev",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Ivshti/stremio-addons-client/issues"
+  },
+  "homepage": "https://github.com/Ivshti/stremio-addons-client"
+}
