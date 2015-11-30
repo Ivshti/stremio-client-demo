@@ -20,5 +20,9 @@
   "bugs": {
     "url": "https://github.com/Ivshti/stremio-addons-client/issues"
   },
-  "homepage": "https://github.com/Ivshti/stremio-addons-client"
+  "homepage": "https://github.com/Ivshti/stremio-addons-client",
+  "dependencies": {
+    "express": "^4.13.3",
+    "stremio-addons": "^1.17.1"
+  }
 }
