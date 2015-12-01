@@ -24,6 +24,7 @@
   "homepage": "https://github.com/Ivshti/stremio-addons-client",
   "dependencies": {
     "express": "^4.13.3",
-    "stremio-addons": "^1.17.1"
+    "lodash": "^3.10.1",
+    "stremio-addons": "^1.17.2"
   }
 }

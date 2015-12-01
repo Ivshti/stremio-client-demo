@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<link rel='stylesheet' type='text/css' media='all' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css' />
+	<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+	<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+	<style>
+		.ng-hide { display: none; }
+	</style>
+</head>
+
+<body ng-app="catalog">
+	<div class='container' ng-controller="CatalogController as Catalog">
+		<div class='center_col' id='center_col'>
+			<div class="panel panel-shadow">
+			<div class="panel-body" ng-cloak ng-class="ng-hide">
+				<div class="row">
+					<div class="col-xs-2">
+						<ul class="nav nav-pills nav-stacked cat-types">
+							<li ng-repeat="(key, val) in Catalog.catTypes" ng-class="{'active': Catalog.showType === key}"><a href="" ng-click="Catalog.selectType(key)">{{val.name}}</a></li>
+						</ul>
+						<hr ng-hide="Catalog.showType === 'search'">
+						<ul ng-hide="Catalog.showType === 'search'" class="nav nav-pills nav-stacked cat-genres">
+							<li ng-class="{'active': !Catalog.showGenre}"><a href="" ng-click="Catalog.selectGenre(null)">Top</a></li>
+							<li ng-repeat="(genre, _) in Catalog.genres[Catalog.showType]" ng-class="{'active': Catalog.showGenre === genre}"><a href="" ng-click="Catalog.selectGenre(genre)">{{genre}}</a></li>
+						</ul>
+					</div>
+					<div class="col-xs-7">
+						<div class="row catalog" ng-show="Catalog.items">
+							<div ng-repeat="res in Catalog.items" ng-if="res.poster" class="col-xs-4 col-lg-3 nopadding" >
+								<div class="panel" ng-class="res.imdb_id == Catalog.selected.imdb_id ? 'panel-primary' : ''">
+									<a href="" ng-click="Catalog.selectMovie(res)">
+										<img class="img-responsive" ng-src="{{Catalog.formatImgURL(res.poster, 210, 300) || 'no-poster.jpg'}}" alt="{{res.name}}" />
+									</a>
+									<a ng-cloak class="play-button" href="#" ng-click="Catalog.playMovie(res)" ng-show="res.imdb_id == Catalog.selected.imdb_id">
+										<img src="play_circle.png" alt="Play"/>
+									</a>
+								</div>
+							</div>
+						</div>
+						<div ng-show="Catalog.loading">
+							<p><i class="fa fa-cog fa-spin"></i> Loading...</p>
+						</div>
+						<div ng-hide="Catalog.items.length || Catalog.loading">
+							<p>No items to display</p>
+						</div>
+					</div>
+					<div class="col-xs-3" ng-show="Catalog.selected">
+						<div class="panel panel-default movie-info affix">
+							<div class="panel-body" style="position: relative; font-size: 13px;">
+								<h2 class="text-uppercase"> {{Catalog.selected.name}}</h2>
+								<ul class="list-inline">
+									<li ng-repeat-start="(id, genre) in Catalog.selected.genre" ng-show="id" role="separator">|</li>
+									<li ng-repeat-end>{{genre}}</li>
+								</ul>
+								<table class="table table-borderless">
+									<tr>
+										<th ng-show="Catalog.selected.imdbRating" class="text-uppercase">IMDB</th>
+										<th class="text-uppercase">Year</th>
+										<th ng-show="Catalog.selected.director" class="text-uppercase">Director</th>
+									</tr>
+									<tr class="sidebar-values">
+										<td ng-show="Catalog.selected.imdbRating">
+											{{Catalog.selected.imdbRating}}
+										</td>
+										<td>{{Catalog.selected.year}}</td>
+										<td ng-show="Catalog.selected.director">
+											{{Catalog.selected.director.join(', ')}}
+										</td>
+									</tr>
+								</table>
+								<h3 class="text-uppercase">Lead actors</h3>
+								<p>{{Catalog.selected.cast.join(', ')}}</p>
+								<h3 class="text-uppercase">Summary</h3>
+								<p>{{Catalog.selected.description}}</p>
+
+								<table class="table table-borderless" ng-show="Catalog.selected.stream">
+									<tr>
+										<th class="text-uppercase">infohash</th>
+									</tr>
+									<tr>
+										<td><a title="click to watch with Stremio" ng-href="stremio://{{Catalog.selected.stream.infoHash}}">{{Catalog.selected.stream.infoHash}}</a></td>
+									</tr>
+									<tr>
+										<td>{{Catalog.selected.stream.uploaders}} uploaders, {{Catalog.selected.stream.downloaders}} downloaders, {{Catalog.selected.stream.tag.join(", ")}}</td>
+									</tr>
+									<!--
+									<tr>
+										<td><a ng-href="stremio://{{Catalog.selected.stream.infoHash}}">click to watch in Stremio</a></td>
+									</tr>
+									-->
+								</table>
+							</div>
+						</div>
+					</div>
+					</div>
+			</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+	<script src="http://www.strem.io/js/stremio-addons.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	<script src="/catalog.js"></script>
+	<link href="./style.css" rel="stylesheet" type="text/css" />
+
+</body>
+</html>
