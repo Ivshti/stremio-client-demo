@@ -4,7 +4,8 @@
   "description": "An example client to the Stremio add-ons protocol, similar to Stremio's Discover",
   "main": "index.js",
   "scripts": {
-    "test": "node test/*"
+    "test": "node test/*",
+    "start": "node index"
   },
   "repository": {
     "type": "git",
