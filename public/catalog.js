@@ -13,34 +13,24 @@ Catalog.factory('Items', [ '$q', '$rootScope', '$location', function($q, $scope,
 	addons.add("http://cinemeta.strem.io/stremioget");
 	addons.add("http://channels.strem.io/stremioget");
 
-	var addonUrl = $location.search().addon || window.location.origin;
-	addons.add(addonUrl); 
+	var addonUrl = $location.search().addon;
+	if (addonUrl) addons.add(addonUrl); 
 
 	var genres = self.genres = {};
 	var items = [];
-	// NOTE: refresh sometimes
-	var popularities = { };
-	addons.call("stream.popularities", { }, function(err, res) {
-		if (! (res && res.popularities)) return;
 
-		popularities = res.popularities;
+	addons.meta.find({ query: { }, limit: 500, skip: 0, complete: true, popular: true, projection: "lean" }, function(err, r) {
+		if (!r) return;
 
-		var p = Object.keys(popularities)
-			.map(function(k) { return [k, popularities[k]] })
-			.sort(function(a,b) { return b[1] - a[1] }).map(function(x) { return x[0] }).slice(0, 500);
-		addons.meta.find({ query: { imdb_id: { $in: p } }, limit: 500, skip: 0, complete: true, popular: true, projection: "lean" }, function(err, r) {
-			if (!r) return;
-
-			items = r;
-			items.forEach(function(x) { 
-				if (! genres[x.type]) genres[x.type] = { };
-				if (x.genre) x.genre.forEach(function(g) { genres[x.type][g] = 1 });
-			});
-			$scope.$apply();
+		items = r;
+		items.forEach(function(x) { 
+			if (! genres[x.type]) genres[x.type] = { };
+			if (x.genre) x.genre.forEach(function(g) { genres[x.type][g] = 1 });
 		});
+		$scope.$apply();
 	});
+
 	self.all = function() { return items };
-	self.popularities = function() { return popularities };
 
 	return self;
 }]);
@@ -72,8 +62,7 @@ Catalog.controller('CatalogController', ['Items', '$scope', '$timeout', '$window
 		if (! self.selected) return;
 		Items.addons.stream.find({ query: { imdb_id: self.selected.imdb_id } }, function(err, res) { 
 			self.selected.streams = res;
-			self.selected.stream = res[0];
-			console.log(self.selected.stream)
+			self.selected.stream = res[0]; // OBSOLETE
 			$scope.$apply();
 		});
 	});
