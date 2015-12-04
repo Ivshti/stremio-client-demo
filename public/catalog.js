@@ -4,7 +4,17 @@ Catalog.config([ '$compileProvider', function($compileProvider) {
 	$compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|stremio):/);
 }]);
 
-Catalog.factory('Items', [ '$q', '$rootScope', '$location', function($q, $scope, $location) {
+Catalog.factory("stremio", ["$http", function($http) {
+	var self = {};
+	
+	$http.get("http://api9.strem.io/addons5").success(function(res) {
+		console.log(res);
+	});
+
+	return self;
+}]);
+
+Catalog.factory('Items', [ 'stremio', '$rootScope', '$location', function(stremio, $scope, $location) {
 	var Client = require("stremio-addons").Client;
 	var addons = new Client();
 
