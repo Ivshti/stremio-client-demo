@@ -6,7 +6,7 @@ Catalog.config([ '$compileProvider', function($compileProvider) {
 }]);
 
 // Initiate the client to the add-ons
-Catalog.factory("stremio", ["$http", "$rootScope", function($http, $scope) {
+Catalog.factory("stremio", ["$http", "$rootScope", "$location", function($http, $scope, $location) {
 	var Stremio = require("stremio-addons");
 	var stremio = new Stremio.Client();
 
@@ -15,6 +15,10 @@ Catalog.factory("stremio", ["$http", "$rootScope", function($http, $scope) {
 	stremio.thirdparty = [];
 
 	var add = stremio.add.bind(stremio);
+	
+	var addonUrl = $location.search().addon;
+	if (addonUrl) add(addonUrl);
+
 	stremio.official.forEach(add);
 
 	// Load add-ons from the central tracker
