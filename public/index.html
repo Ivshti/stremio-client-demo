@@ -79,7 +79,15 @@
 								<td>{{selected.item.stream.uploaders}} uploaders, {{selected.item.stream.downloaders}} downloaders</td>
 							</tr>-->
 							<tr>
-								<td>{{stream.tag.join(", ")}}</td>
+
+								<td>
+
+									<div ng-show="stream.infoHash"><a ng-href="magnet:?xt=urn:btih:{{stream.infoHash}}">{{stream.infoHash}} / {{stream.mapIdx}}</a></div>
+									<div ng-show="stream.url"><a ng-href="{{stream.url}}">{{stream.url}}</a></div>
+									<div ng-show="stream.externalUrl"><a ng-href="{{stream.externalUrl}}">{{stream.externalUrl}}</a></div>
+
+									{{stream.tag.join(", ")}}
+								</td>
 
 							</tr>
 

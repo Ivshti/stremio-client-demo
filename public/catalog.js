@@ -1,8 +1,8 @@
 var Catalog = angular.module('catalog', []);
 
-// Allow stremio:// protocol
+// Allow stremio:// and magnet:// protocols
 Catalog.config([ '$compileProvider', function($compileProvider) {   
-	$compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|stremio):/);
+	$compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|stremio|magnet):/);
 }]);
 
 // Initiate the client to the add-ons
@@ -15,7 +15,7 @@ Catalog.factory("stremio", ["$http", "$rootScope", "$location", function($http, 
 	stremio.thirdparty = [];
 
 	var add = stremio.add.bind(stremio);
-	
+
 	var addonUrl = $location.search().addon;
 	if (addonUrl) add(addonUrl);
 
