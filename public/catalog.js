@@ -1,35 +1,38 @@
 var Catalog = angular.module('catalog', []);
 
+// Allow stremio:// protocol
 Catalog.config([ '$compileProvider', function($compileProvider) {   
 	$compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|stremio):/);
 }]);
 
+// Initiate the client to the add-ons
 Catalog.factory("stremio", ["$http", function($http) {
-	var self = {};
-	
-	$http.get("http://api9.strem.io/addons5").success(function(res) {
-		console.log(res);
-	});
+	var Stremio = require("stremio-addons");
+	var stremio = new Stremio.Client();
 
-	return self;
+	stremio.official = ["http://cinemeta.strem.io", "http://guidebox.strem.io", "http://channels.strem.io", "http://filmon.strem.io"];
+	stremio.thirdparty = [];
+
+	var add = stremio.add.bind(stremio);
+	stremio.official.forEach(add);
+
+	// Load add-ons from tracker
+	$http.get("http://api9.strem.io/addons5").success(function(res) {
+		stremio.official = res.official;
+		stremio.thirdparty = res.thirdparty;
+		res.official.forEach(add); res.thirdparty.forEach(add);
+	}).error(function(er) { console.error("add-ons tracker", er) });
+
+	return stremio;
 }]);
 
 Catalog.factory('Items', [ 'stremio', '$rootScope', '$location', function(stremio, $scope, $location) {
-	var Client = require("stremio-addons").Client;
-	var addons = new Client();
-
-	var self = { addons: addons };
-
-	addons.add("http://cinemeta.strem.io/stremioget");
-	addons.add("http://channels.strem.io/stremioget");
-
-	var addonUrl = $location.search().addon;
-	if (addonUrl) addons.add(addonUrl); 
+	var self = { };
 
 	var genres = self.genres = {};
 	var items = [];
 
-	addons.meta.find({ query: { }, limit: 500, skip: 0, complete: true, popular: true, projection: "lean" }, function(err, r) {
+	stremio.meta.find({ query: { }, limit: 200, skip: 0, complete: true, popular: true, projection: "lean" }, function(err, r) {
 		if (!r) return;
 
 		items = r;
@@ -45,7 +48,7 @@ Catalog.factory('Items', [ 'stremio', '$rootScope', '$location', function(stremi
 	return self;
 }]);
 
-Catalog.controller('CatalogController', ['Items', '$scope', '$timeout', '$window', '$q', function CatalogController(Items, $scope, $timeout, $window, $q) {
+Catalog.controller('CatalogController', ['Items', 'stremio', '$scope', '$timeout', '$window', '$q', function CatalogController(Items, stremio, $scope, $timeout, $window, $q) {
 	var self = this;
 
 	var imdb_proxy = '/poster/';
@@ -70,7 +73,7 @@ Catalog.controller('CatalogController', ['Items', '$scope', '$timeout', '$window
 	});
 	$scope.$watch(function() { return self.selected && self.selected.imdb_id }, function() {
 		if (! self.selected) return;
-		Items.addons.stream.find({ query: { imdb_id: self.selected.imdb_id } }, function(err, res) { 
+		stremio.stream.find({ query: { imdb_id: self.selected.imdb_id } }, function(err, res) { 
 			self.selected.streams = res;
 			self.selected.stream = res[0]; // OBSOLETE
 			$scope.$apply();
