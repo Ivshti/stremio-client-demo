@@ -5,14 +5,18 @@ h2 { font-size: 23px; }
 
 h3 { font-size: 21px; }
 
-.center_col h1{
+.container {
+	margin-top: 2%;
+}
+
+.container h1{
 	font-size: 20px;
 	margin: 0 0;
 	padding: 5px 0;
 	text-transform: uppercase;
 }
 
-.center_col h3{
+.container h3{
 	font-size: 12px;
 	margin: 0 0;
 	color: #FFF;

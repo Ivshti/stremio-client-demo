@@ -38,7 +38,7 @@ Catalog.factory('Items', [ 'stremio', '$rootScope', '$location', function(stremi
 
 	// Get all supported types of the stremio addons client - e.g. movie, series, channel
 	var types = [];
-	$scope.$watch(function() { console.log(stremio.supportedTypes);return types = Object.keys(stremio.supportedTypes).sort() }, _.debounce(function() {
+	$scope.$watch(function() { return types = Object.keys(stremio.supportedTypes).sort() }, _.debounce(function() {
 		types.forEach(function(type) {
 			// Query for each type - the add-ons client will automagically decide which add-on to pick for each type
 			stremio.meta.find({ query: { type: type }, limit: 200, skip: 0, complete: true, popular: true, projection: "lean" }, function(err, r, addon) {
@@ -68,30 +68,32 @@ Catalog.controller('CatalogController', ['Items', 'stremio', '$scope', '$timeout
 	var imdb_proxy = '/poster/';
 
 	self.loading = false; // TOOD use
-	self.query = '';
-	self.showType = 'movie';
-	self.showGenre = '';
-	self.catTypes = {
-		movie: { name: 'Movies', genres: {} },
-		series: { name: 'TV Shows', genres: {} },
-		channel: { name: 'Channel', genres: {} },
-		tv: { name: 'TV channels', genres: {} },
+	self.query = ''; // TODO: search
 
+	$scope.selected = { type: "movie", genre: null }; // selected category, genre
+
+	self.catTypes = {
+		movie: { name: 'Movies' },
+		series: { name: 'TV Shows' },
+		channel: { name: 'Channel' },
+		tv: { name: 'TV channels' },
 	};
 	self.genres = Items.genres;
 
-	$scope.$watchCollection(function() { return [self.showType, self.showGenre, Items.all().length] }, function() {
+	$scope.$watchCollection(function() { return [$scope.selected.type, $scope.selected.genre, Items.all().length] }, function() {
 		self.items = Items.all().filter(function(x) { 
-			return (x.type == self.showType) && 
-				(!self.showGenre || (x.genre.indexOf(self.showGenre) > -1))
+			return (x.type == $scope.selected.type) && 
+				(!$scope.selected.genre || (x.genre && x.genre.indexOf($scope.selected.genre) > -1))
 		});
-		self.selected = self.items[0];
+		$scope.selected.item = self.items[0];
 	});
-	$scope.$watch(function() { return self.selected && self.selected.imdb_id }, function() {
-		if (! self.selected) return;
-		stremio.stream.find({ query: { imdb_id: self.selected.imdb_id } }, function(err, res) { 
-			self.selected.streams = res;
-			self.selected.stream = res[0]; // OBSOLETE
+
+	// Get all streams for an item
+	$scope.$watch(function() { return $scope.selected.item && $scope.selected.item.imdb_id }, function() {
+		if (! $scope.selected.item) return;
+		stremio.stream.find({ query: { imdb_id: $scope.selected.item.imdb_id } }, function(err, res) { 
+			if (!$scope.selected.item) return;
+			$scope.selected.item.streams = res;
 			$scope.$apply();
 		});
 	});
@@ -104,22 +106,6 @@ Catalog.controller('CatalogController', ['Items', 'stremio', '$scope', '$timeout
 		if (1 === splitted.length) return url;
 
 		return imdb_proxy + encodeURIComponent(url.split("/").slice(0,-1).join("/") + "/" + splitted[0] + "._V1._SX" + width + "_CR0,0," + width + "," + height + "_.jpg");
-	};
-
-
-	self.selectGenre = function selectGenre(genre) {
-		if(self.showGenre === genre) return;
-		self.showGenre = genre;
-	};
-
-	self.selectType = function selectType(type) {
-		if (self.showType === type) return;
-		self.showType = type;
-		self.showGenre = '';
-	};
-
-	self.selectMovie = function selectMovie(movie) {
-		self.selected = movie;
 	};
 
 	return self;
