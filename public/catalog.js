@@ -30,7 +30,21 @@ Catalog.factory("stremio", ["$http", "$rootScope", function($http, $scope) {
 	return stremio;
 }]);
 
-Catalog.factory('Items', [ 'stremio', '$rootScope', '$location', function(stremio, $scope, $location) {
+
+// Metadata model
+var useAsId = ["yt_id", "filmon_id", "streamfeed_id"]; // TODO: load from add-ons
+Catalog.factory('metadata', function() {
+	return function metadata(meta) {
+		var self = this;
+		Object.defineProperty(self, "id", { get: function() {
+			if (self.imdb_id) return self.imdb_id;
+			for (var i=0; i!=useAsId.length; i++) if (self[useAsId[i]]) return useAsId[i]+":"+self[useAsId[i]];
+		} });
+		_.extend(this, meta);
+	};
+});
+
+Catalog.factory('Items', [ 'stremio', 'metadata', '$rootScope', '$location', function(stremio, metadata, $scope, $location) {
 	var self = { loading: true };
 
 	var genres = self.genres = { };
@@ -44,7 +58,7 @@ Catalog.factory('Items', [ 'stremio', '$rootScope', '$location', function(stremi
 		types.forEach(function(type) {
 			// Query for each type - the add-ons client will automagically decide which add-on to pick for each type
 			stremio.meta.find({ query: { type: type }, limit: 200, skip: 0, complete: true, popular: true, projection: "lean" }, function(err, r, addon) {
-				if (++i == types.length) loading = false;
+				if (++i == types.length) self.loading = false;
 				delayedApply();
 
 				if (!r) return;
@@ -52,7 +66,7 @@ Catalog.factory('Items', [ 'stremio', '$rootScope', '$location', function(stremi
             	// Same message as Desktop app
             	console.log("Discover pulled "+r.length+" items from "+(addon && addon.url));
 
-				items = items.concat(r);
+				items = items.concat(r.map(function(x) { return new metadata(x) }));
 				items.forEach(function(x) { 
 					if (! genres[x.type]) genres[x.type] = { };
 					if (x.genre) x.genre.forEach(function(g) { genres[x.type][g] = 1 });
@@ -65,6 +79,7 @@ Catalog.factory('Items', [ 'stremio', '$rootScope', '$location', function(stremi
 
 	return self;
 }]);
+
 
 Catalog.controller('CatalogController', ['Items', 'stremio', '$scope', '$timeout', '$window', '$q', function CatalogController(Items, stremio, $scope, $timeout, $window, $q) {
 	var self = this;
@@ -94,8 +109,9 @@ Catalog.controller('CatalogController', ['Items', 'stremio', '$scope', '$timeout
 	});
 
 	// Get all streams for an item
-	$scope.$watch(function() { return $scope.selected.item && $scope.selected.item.imdb_id }, function() {
+	$scope.$watch(function() { return $scope.selected.item && $scope.selected.item.id }, function() {
 		if (! $scope.selected.item) return;
+		// TODO: dynamic id
 		stremio.stream.find({ query: { imdb_id: $scope.selected.item.imdb_id } }, function(err, res) { 
 			if (!$scope.selected.item) return;
 			$scope.selected.item.streams = res;
