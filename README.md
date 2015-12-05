@@ -5,6 +5,7 @@ An example client to the Stremio add-ons protocol, similar to Stremio's Discover
 ## What's this?
 It's an example client of the [stremio-addons](http://github.com/Stremio/stremio-addons) system (which is a multi-client RPC lib). 
 It mimics Stremio's Discover interface, and shows all available streams gathered from all add-ons for a selected movie/series/channel/etc.
+
 **The main purpose of this is to aid developers in creating their own Stremio add-on by showing them how the actual app(s) utilize the add-on client.**
 
 ## How to run
@@ -15,6 +16,8 @@ npm install
 npm start
 # open browser at http://localhost:9900
 ```
+
+##### Open your browser at http://localhost:9900/#?addon=ADDON_URL for your own end-point
 
 ## What are Stremio add-ons
 
