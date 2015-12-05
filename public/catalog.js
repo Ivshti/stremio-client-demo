@@ -34,6 +34,56 @@ Catalog.factory("stremio", ["$http", "$rootScope", "$location", function($http, 
 	return stremio;
 }]);
 
+// Requests: this is for requesting streams from the add-ons system
+Catalog.factory("requests", ["stremio", function(stremio) {	
+	var requests = { };
+	var EventEmitter = require("EventEmitter");
+    requests.candidates = function(args, callback, offlineOnly)
+    {
+        var handle = new EventEmitter(), updated = _.debounce(function() { handle.emit("updated") }, 200);
+        handle.candidates = [];
+        handle.query = angular.copy(args.query);
+
+        var recv = 0, sent = 0, count = function(fn, id) { 
+            sent++; 
+            return function() { recv++; fn.apply(null, arguments); if (recv === sent) handle.emit("finish"); } 
+        };
+
+        // If we have a group that firts specifically to the arguments, discard the others ; true to .get as "noPicker"
+        var services = stremio.get("stream.find", args).filter(function(x) { return x.initialized }), 
+            max = (services[0] && services[0].manifest.filter) ? stremio.checkArgs(args, services[0].manifest.filter) : false,
+        services = services.filter(function(x) { return stremio.checkArgs(args, x.manifest.filter) >= max });
+
+        // Group by identifier, and fallthrough within each group
+        args.stremio_rushed = true; // indicate to addons client to try the next one too if we don't get a quick response
+        if (!offlineOnly) _.chain(services).groupBy(function(x) { return x.identifier() }).each(function(group, id) {
+            stremio.fallthrough(group, "stream.find", args, count(function(err, resp, addon) {
+                if (err) console.error(err);
+
+                add((Array.isArray(resp) ? resp : []).filter(function(x) { return x }).map(function(x) { 
+                    x.addon = addon;
+                    x._id = x.infoHash || x.url || x.externalUrl || x.yt_id; /// for _.uniq
+                    return x;
+                }));
+            }));
+        }).value();
+
+        function add(resp) {
+            var len = handle.candidates.length, hadFirst = !!handle.first;
+            handle.candidates = _.uniq(handle.candidates.concat(resp || []), function(x) { return x._id });
+            handle.selected = handle.first = handle.candidates[0];
+
+            if (handle.candidates.length > len || !hadFirst) updated();
+            if (handle.first && handle.first.isPlayable && !handle.first.isExternal) handle.emit("viable");
+        };
+
+        handle.on("finish", function() { handle.finished = true }); 
+
+        return handle;
+    };
+
+	return requests;
+}])
 
 // Metadata model
 var useAsId = ["imdb_id", "yt_id", "filmon_id", "streamfeed_id"]; // TODO: load from add-ons
@@ -96,7 +146,7 @@ Catalog.factory('Items', [ 'stremio', 'metadata', '$rootScope', '$location', fun
 }]);
 
 
-Catalog.controller('CatalogController', ['Items', 'stremio', '$scope', '$timeout', '$window', '$q', function CatalogController(Items, stremio, $scope, $timeout, $window, $q) {
+Catalog.controller('CatalogController', ['Items', 'stremio', '$scope', '$timeout', '$window', 'requests', function CatalogController(Items, stremio, $scope, $timeout, $window, requests) {
 	var self = this;
 
 	var imdb_proxy = '/poster/';
@@ -125,13 +175,11 @@ Catalog.controller('CatalogController', ['Items', 'stremio', '$scope', '$timeout
 
 	// Get all streams for an item
 	$scope.$watch(function() { return $scope.selected.item && $scope.selected.item.id }, function() {
+		$scope.handle = null;
 		if (! $scope.selected.item) return;
 
-		// TODO: find from all sources
-		stremio.stream.find({ query: $scope.selected.item.getQuery() }, function(err, res) { 
-			if (!$scope.selected.item) return;
-			$scope.selected.item.streams = res;
-			$scope.$apply();
+		$scope.handle = requests.candidates({ query: $scope.selected.item.getQuery() }).on("updated", function() {
+			!$scope.$phase && $scope.$digest();
 		});
 	});
 

@@ -73,7 +73,7 @@
 						<h3 class="text-uppercase">Summary</h3>
 						<p>{{selected.item.description}}</p>
 
-						<table class="table table-borderless" ng-repeat="stream in selected.item.streams">
+						<table class="table table-borderless" ng-repeat="stream in handle.candidates">
 							<!--<tr>
 								<td><a title="click to watch with Stremio" ng-href="stremio://{{selected.item.stream.infoHash}}">{{selected.item.stream.infoHash}}</a></td>
 								<td>{{selected.item.stream.uploaders}} uploaders, {{selected.item.stream.downloaders}} downloaders</td>
@@ -103,6 +103,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+	<script src="/js/eventemitter.js"></script>
 	<script src="/catalog.js"></script>
 	<link href="./style.css" rel="stylesheet" type="text/css" />
 
