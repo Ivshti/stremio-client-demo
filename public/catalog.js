@@ -31,17 +31,22 @@ Catalog.factory("stremio", ["$http", "$rootScope", function($http, $scope) {
 }]);
 
 Catalog.factory('Items', [ 'stremio', '$rootScope', '$location', function(stremio, $scope, $location) {
-	var self = { };
+	var self = { loading: true };
 
 	var genres = self.genres = { };
 	var items = [];
 
+	var delayedApply = _.debounce(function() { !$scope.$phase && $scope.$apply() }, 300);
+
 	// Get all supported types of the stremio addons client - e.g. movie, series, channel
-	var types = [];
+	var types = [], i = 0;
 	$scope.$watch(function() { return types = Object.keys(stremio.supportedTypes).sort() }, _.debounce(function() {
 		types.forEach(function(type) {
 			// Query for each type - the add-ons client will automagically decide which add-on to pick for each type
 			stremio.meta.find({ query: { type: type }, limit: 200, skip: 0, complete: true, popular: true, projection: "lean" }, function(err, r, addon) {
+				if (++i == types.length) loading = false;
+				delayedApply();
+
 				if (!r) return;
             	
             	// Same message as Desktop app
@@ -52,7 +57,6 @@ Catalog.factory('Items', [ 'stremio', '$rootScope', '$location', function(stremi
 					if (! genres[x.type]) genres[x.type] = { };
 					if (x.genre) x.genre.forEach(function(g) { genres[x.type][g] = 1 });
 				});
-				$scope.$apply();
 			});
 		});
 	}, 500), true);
@@ -67,7 +71,6 @@ Catalog.controller('CatalogController', ['Items', 'stremio', '$scope', '$timeout
 
 	var imdb_proxy = '/poster/';
 
-	self.loading = false; // TOOD use
 	self.query = ''; // TODO: search
 
 	$scope.selected = { type: "movie", genre: null }; // selected category, genre
@@ -79,6 +82,8 @@ Catalog.controller('CatalogController', ['Items', 'stremio', '$scope', '$timeout
 		tv: { name: 'TV channels' },
 	};
 	self.genres = Items.genres;
+
+	$scope.$watch(function() { return Items.loading }, function(l) { $scope.loading = l }); 
 
 	$scope.$watchCollection(function() { return [$scope.selected.type, $scope.selected.genre, Items.all().length] }, function() {
 		self.items = Items.all().filter(function(x) { 
