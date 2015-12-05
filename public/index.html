@@ -73,21 +73,16 @@
 						<h3 class="text-uppercase">Summary</h3>
 						<p>{{selected.item.description}}</p>
 
-						<table class="table table-borderless" ng-show="selected.item.stream">
-							<tr>
-								<th class="text-uppercase">infohash</th>
-							</tr>
-							<tr>
+						<table class="table table-borderless" ng-repeat="stream in selected.item.streams">
+							<!--<tr>
 								<td><a title="click to watch with Stremio" ng-href="stremio://{{selected.item.stream.infoHash}}">{{selected.item.stream.infoHash}}</a></td>
-							</tr>
+								<td>{{selected.item.stream.uploaders}} uploaders, {{selected.item.stream.downloaders}} downloaders</td>
+							</tr>-->
 							<tr>
-								<td>{{selected.item.stream.uploaders}} uploaders, {{selected.item.stream.downloaders}} downloaders, {{selected.item.stream.tag.join(", ")}}</td>
+								<td>{{stream.tag.join(", ")}}</td>
+
 							</tr>
-							<!--
-							<tr>
-								<td><a ng-href="stremio://{{selected.item.stream.infoHash}}">click to watch in Stremio</a></td>
-							</tr>
-							-->
+
 						</table>
 					</div>
 				</div>

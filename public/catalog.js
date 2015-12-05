@@ -32,15 +32,26 @@ Catalog.factory("stremio", ["$http", "$rootScope", function($http, $scope) {
 
 
 // Metadata model
-var useAsId = ["yt_id", "filmon_id", "streamfeed_id"]; // TODO: load from add-ons
+var useAsId = ["imdb_id", "yt_id", "filmon_id", "streamfeed_id"]; // TODO: load from add-ons
 Catalog.factory('metadata', function() {
 	return function metadata(meta) {
 		var self = this;
-		Object.defineProperty(self, "id", { get: function() {
+		_.extend(self, meta);
+
+		Object.defineProperty(self, "id", { enumerable: true, get: function() {
 			if (self.imdb_id) return self.imdb_id;
 			for (var i=0; i!=useAsId.length; i++) if (self[useAsId[i]]) return useAsId[i]+":"+self[useAsId[i]];
 		} });
-		_.extend(this, meta);
+		
+		self.getQuery = function(extra) {
+			var query = { type: self.type };
+			for (var i=0; i!=useAsId.length; i++) if (self[useAsId[i]]) query[useAsId[i]] = self[useAsId[i]];
+			if (self.type == "series") _.extend(query, { season: 1, episode: 1 });
+			//if (type == "channel") // yt_id
+			if (extra) _.extend(query, extra);
+			return query;
+		};
+
 	};
 });
 
@@ -111,8 +122,9 @@ Catalog.controller('CatalogController', ['Items', 'stremio', '$scope', '$timeout
 	// Get all streams for an item
 	$scope.$watch(function() { return $scope.selected.item && $scope.selected.item.id }, function() {
 		if (! $scope.selected.item) return;
-		// TODO: dynamic id
-		stremio.stream.find({ query: { imdb_id: $scope.selected.item.imdb_id } }, function(err, res) { 
+
+		// TODO: find from all sources
+		stremio.stream.find({ query: $scope.selected.item.getQuery() }, function(err, res) { 
 			if (!$scope.selected.item) return;
 			$scope.selected.item.streams = res;
 			$scope.$apply();
