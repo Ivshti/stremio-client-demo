@@ -14,7 +14,13 @@ It mimics Stremio's Discover interface, and shows all available streams gathered
 1. Stremio has a user log-in, and utilizes only the enabled add-ons by the user. This utilizes all add-ons served by the tracker.
 2. The desktop app caches received results in [linvodb](http://github.com/Stremio/linvodb3), while this always loads them on demand
 
-But all in all, if an add-on works here, it should work on the desktop app and the mobile app.
+**But all in all, if an add-on works here, it should work on the desktop app and the mobile app.**
 
+## Can I see example add-ons?
 
+[Guidebox add-on](http://github.com/Stremio/guidebox-stremio)
+
+[Filmon.tv add-on](http://github.com/Stremio/filmon-stremio)
+
+Coming soon: public domain movies, YouTube channels
 
