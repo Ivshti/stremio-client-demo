@@ -154,6 +154,7 @@ Catalog.controller('CatalogController', ['Items', 'stremio', '$scope', '$timeout
 	self.query = ''; // TODO: search
 
 	$scope.selected = { type: "movie", genre: null }; // selected category, genre
+	$scope.isLoading = function() { return Items.loading };
 
 	self.catTypes = {
 		movie: { name: 'Movies' },
@@ -162,8 +163,6 @@ Catalog.controller('CatalogController', ['Items', 'stremio', '$scope', '$timeout
 		tv: { name: 'TV channels' },
 	};
 	self.genres = Items.genres;
-
-	$scope.$watch(function() { return Items.loading }, function(l) { $scope.loading = l }); 
 
 	$scope.$watchCollection(function() { return [$scope.selected.type, $scope.selected.genre, Items.all().length] }, function() {
 		self.items = Items.all().filter(function(x) { 

@@ -37,10 +37,10 @@
 						</div>
 					</div>
 				</div>
-				<div ng-show="loading">
+				<div ng-show="isLoading()">
 					<p><i class="fa fa-cog fa-spin"></i> Loading...</p>
 				</div>
-				<div ng-hide="Catalog.items.length || loading">
+				<div ng-hide="Catalog.items.length || isLoading()">
 					<p>No items to display</p>
 				</div>
 			</div>
