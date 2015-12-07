@@ -15,6 +15,9 @@ app.get('/poster/:url', function(req, res) {
 	req.on('error', function(err) { console.error(err) });
 });
 
+app.get("/js/stremio-addons.min.js", function(req, res) {
+  res.sendFile("./node_modules/stremio-addons/browser/stremio-addons.min.js");
+});
 
 app.listen(app.get('port'), function () {
     console.log('Express server listening on port ' + app.get('port'));
