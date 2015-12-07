@@ -74,8 +74,8 @@
 						<p>{{selected.item.description}}</p>
 
 						<table class="table table-borderless">
-							<tr><td>
-								<select ng-options="selected.item.videos || selected.item.episodes"></select>
+							<tr><td ng-show="selected.item.uploads || selected.item.episodes">
+								<select ng-model="selected.video" ng-options="item as item.name for item in (selected.item.uploads || selected.item.episodes)"></select>
 							</td></tr>
 						</table>
 

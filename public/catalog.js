@@ -179,6 +179,13 @@ Catalog.controller('CatalogController', ['Items', 'stremio', '$scope', '$timeout
 		$scope.handle = requests.candidates({ query: $scope.selected.item.getQuery() }).on("updated", function() {
 			!$scope.$phase && $scope.$digest();
 		});
+
+		stremio.meta.get({ query: $scope.selected.item.getQuery() }, function(err, fullmeta) {
+			if (fullmeta && $scope.selected.item) { 
+				_.extend($scope.selected.item, fullmeta);
+				!$scope.$phase && $scope.$digest();
+			}
+		});
 	});
 
 	self.formatImgURL = function formatImgURL(url, width, height) {

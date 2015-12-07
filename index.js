@@ -16,7 +16,7 @@ app.get('/poster/:url', function(req, res) {
 });
 
 app.get("/js/stremio-addons.min.js", function(req, res) {
-  res.sendFile("./node_modules/stremio-addons/browser/stremio-addons.min.js");
+  res.sendfile("./node_modules/stremio-addons/browser/stremio-addons.min.js");
 });
 
 app.listen(app.get('port'), function () {
