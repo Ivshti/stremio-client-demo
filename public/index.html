@@ -55,22 +55,22 @@
 						<table class="table table-borderless">
 							<tr>
 								<th ng-show="selected.item.imdbRating" class="text-uppercase">IMDB</th>
-								<th class="text-uppercase">Year</th>
+								<th ng-show="selected.item.year" class="text-uppercase">Year</th>
 								<th ng-show="selected.item.director" class="text-uppercase">Director</th>
 							</tr>
 							<tr class="sidebar-values">
-								<td ng-show="selected.item.imdbRating">
+								<td ng-if="selected.item.imdbRating">
 									{{selected.item.imdbRating}}
 								</td>
-								<td>{{selected.item.year}}</td>
-								<td ng-show="selected.item.director">
+								<td ng-if="selected.item.year">{{selected.item.year}}</td>
+								<td ng-if="selected.item.director">
 									{{selected.item.director.join(', ')}}
 								</td>
 							</tr>
 						</table>
-						<h3 class="text-uppercase">Lead actors</h3>
+						<h3 class="text-uppercase" ng-if="selected.item.cast">Lead actors</h3>
 						<p>{{selected.item.cast.join(', ')}}</p>
-						<h3 class="text-uppercase">Summary</h3>
+						<h3 class="text-uppercase" ng-if="selected.item.description">Summary</h3>
 						<p>{{selected.item.description}}</p>
 
 						<table class="table table-borderless">
