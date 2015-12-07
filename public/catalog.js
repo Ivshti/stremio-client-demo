@@ -172,23 +172,29 @@ Catalog.controller('CatalogController', ['Items', 'stremio', '$scope', '$timeout
 	});
 
 	// Get all streams for an item
+	var delayedDigest = _.debounce(function() { !$scope.$phase && $scope.$digest() }, 300);
 	$scope.$watch(function() { return $scope.selected.item && $scope.selected.item.id }, function() {
 		$scope.handle = null;
 		if (! $scope.selected.item) return;
 
-		$scope.handle = requests.candidates({ query: $scope.selected.item.getQuery() }).on("updated", function() {
-			!$scope.$phase && $scope.$digest();
-		});
+		$scope.handle = requests.candidates({ query: $scope.selected.item.getQuery() }).on("updated", delayedDigest);
 
 		stremio.meta.get({ query: $scope.selected.item.getQuery() }, function(err, fullmeta) {
 			if (fullmeta && $scope.selected.item) { 
 				_.extend($scope.selected.item, fullmeta);
-				!$scope.$phase && $scope.$digest();
+				delayedDigest();
+				$scope.selected.video = fullmeta.episodes ? fullmeta.episodes[0] : (fullmeta.uploads ? fullmeta.uploads[0] : null);
 			}
 		});
 	});
 
-	self.formatImgURL = function formatImgURL(url, width, height) {
+	// This is for another scope
+	$scope.getVidName = function(vid) {
+		if (vid.hasOwnProperty("season")) return "("+vid.season+"x"+vid.number+") "+vid.name;
+		else return vid.title;
+	};
+
+	$scope.formatImgURL = function formatImgURL(url, width, height) {
 		if (!url || -1 === url.indexOf("imdb.com")) return url;
 
 		var splitted = url.split("/").pop().split(".");

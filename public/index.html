@@ -29,7 +29,7 @@
 					<div ng-repeat="res in Catalog.items" ng-if="res.poster" class="col-xs-4 col-lg-3 nopadding" >
 						<div class="panel" ng-class="res.id == selected.item.id ? 'panel-primary' : ''">
 							<a href="" ng-click="selected.item = res">
-								<img class="img-responsive" ng-src="{{Catalog.formatImgURL(res.poster, 210, 300) || 'no-poster.jpg'}}" alt="{{res.name}}" />
+								<img class="img-responsive" ng-src="{{formatImgURL(res.poster, 210, 300) || 'no-poster.jpg'}}" alt="{{res.name}}" />
 							</a>
 							<a ng-cloak class="play-button" href="#" ng-click="Catalog.playMovie(res)" ng-show="res.id == selected.item.id">
 								<img src="play_circle.png" alt="Play"/>
@@ -75,7 +75,7 @@
 
 						<table class="table table-borderless">
 							<tr><td ng-show="selected.item.uploads || selected.item.episodes">
-								<select ng-model="selected.video" ng-options="item as item.name for item in (selected.item.uploads || selected.item.episodes)"></select>
+								<select ng-model="selected.video" ng-options="item as getVidName(item) for item in (selected.item.uploads || selected.item.episodes)"></select>
 							</td></tr>
 						</table>
 
