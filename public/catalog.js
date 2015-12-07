@@ -100,8 +100,7 @@ Catalog.factory('metadata', function() {
 		self.getQuery = function(extra) {
 			var query = _.extend({ type: self.type }, _.pick(self, useAsId));
 			if (self.type == "series") _.extend(query, { season: 1, episode: 1 });
-			//if (type == "channel") // yt_id
-			if (extra) _.extend(query, extra);
+			if (extra) _.extend(query, { yt_id: extra.id, season: extra.season, episode: extra.number });
 			return query;
 		};
 
@@ -175,9 +174,8 @@ Catalog.controller('CatalogController', ['Items', 'stremio', '$scope', '$timeout
 	var delayedDigest = _.debounce(function() { !$scope.$phase && $scope.$digest() }, 300);
 	$scope.$watch(function() { return $scope.selected.item && $scope.selected.item.id }, function() {
 		$scope.handle = null;
+		$scope.selected.video = null;
 		if (! $scope.selected.item) return;
-
-		$scope.handle = requests.candidates({ query: $scope.selected.item.getQuery() }).on("updated", delayedDigest);
 
 		stremio.meta.get({ query: $scope.selected.item.getQuery() }, function(err, fullmeta) {
 			if (fullmeta && $scope.selected.item) { 
@@ -187,6 +185,12 @@ Catalog.controller('CatalogController', ['Items', 'stremio', '$scope', '$timeout
 			}
 		});
 	});
+
+	$scope.$watch(function() { return $scope.selected.video || $scope.selected.item }, function() {
+		$scope.handle = null;
+		if (! $scope.selected.item) return;
+		$scope.handle = requests.candidates({ query: $scope.selected.item.getQuery($scope.selected.video) }).on("updated", delayedDigest);
+	}, true);
 
 	// This is for another scope
 	$scope.getVidName = function(vid) {
