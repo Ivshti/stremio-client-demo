@@ -98,8 +98,7 @@ Catalog.factory('metadata', function() {
 		} });
 		
 		self.getQuery = function(extra) {
-			var query = { type: self.type };
-			for (var i=0; i!=useAsId.length; i++) if (self[useAsId[i]]) query[useAsId[i]] = self[useAsId[i]];
+			var query = _.extend({ type: self.type }, _.pick(self, useAsId));
 			if (self.type == "series") _.extend(query, { season: 1, episode: 1 });
 			//if (type == "channel") // yt_id
 			if (extra) _.extend(query, extra);
