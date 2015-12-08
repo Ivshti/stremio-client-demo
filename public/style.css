@@ -29,6 +29,7 @@ h3 { font-size: 21px; }
 	border-width: 3px;
 	margin-bottom: 0;
 }
+.catalog .panel .img-responsive { min-width: 100%;}
 .catalog .panel-primary {
 	box-shadow: 2px 2px 6px -2px gray;
 }
