@@ -126,9 +126,10 @@ app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainCo
 	var PAGE_LEN = 140;
 
 	$scope.selected = { type: "movie", genre: null, limit: PAGE_LEN }; // selected category, genre
+
+	$scope.sorts = [{ name: "Popularity", prop: "popularity" }];
 	
 	var loading = true, genres = $scope.genres = { }, items = [];
-	$scope.isLoading = function() { return loading };
 
 	var delayedApply = _.debounce(function() { !$scope.$phase && $scope.$apply() }, 300);
 
@@ -149,6 +150,7 @@ app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainCo
 		});
 	};
 
+	// Load initial data for each type
 	var types = [], i = 0;
 	$scope.$watch(function() { return types = Object.keys(stremio.supportedTypes).sort() }, _.debounce(function() {
 		types.forEach(function(type) {
@@ -160,19 +162,20 @@ app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainCo
 		});
 	}, 500), true);
 
+	// Reset page on every change of type/genre/sort
 	var askedFor;
 	$scope.$watchCollection(function() { return [$scope.selected.type, $scope.selected.genre, $scope.selected.sort] }, function() {
 		$scope.selected.limit = PAGE_LEN;
 		askedFor = PAGE_LEN;
 	});
 
+	// Update displayed items, load more items
 	$scope.$watchCollection(function() { return [$scope.selected.type, $scope.selected.genre, $scope.selected.limit, items.length] }, function() {		
 		$scope.items = items.filter(function(x) { 
 			return (x.type == $scope.selected.type) && 
 				(!$scope.selected.genre || (x.genre && x.genre.indexOf($scope.selected.genre) > -1))
 		}).slice(0, $scope.selected.limit);
 		$scope.selected.item = $scope.items[0];
-
 
 		var limit = $scope.selected.limit;
 		if ($scope.items.length<limit && askedFor != limit) stremio.meta.find({ 
@@ -183,6 +186,8 @@ app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainCo
 			receiveItems(err, r, addon);
 		});
 	});
+
+	$scope.isLoading = function() { return loading };
 
 	$scope.loadNextPage = function() {
 		$scope.selected.limit += PAGE_LEN;
@@ -197,29 +202,6 @@ app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainCo
 
 		return IMDB_PROXY + encodeURIComponent(url.split("/").slice(0,-1).join("/") + "/" + splitted[0] + "._V1._SX" + width + "_CR0,0," + width + "," + height + "_.jpg");
 	};
-
-
-	// Featured content
-	// This can be done by listening to addon-ready much more easily
-	 /*
-	var featuredIds = [];
-	$scope.featured = [];
-	$scope.$watchCollection(function() {
-		stremio.get().forEach(function(s) { 
-			if (s.manifest.featured && s.manifest.featured[stremio.countryCode]) featuredIds.push(s.manifest.featured[stremio.countryCode]);
-			if (s.manifest.featured && s.manifest.featured.ALL) featuredIds.push(s.manifest.featured.ALL);
-		});
-		featuredIds = _.chain(featuredIds).flatten().uniq().value();
-		return featuredIds;
-	}, _.debounce(function() {
-		var metas = [];
-		metadata.retrieveMany(featuredIds, false, function(id, m) { if (m) metas.push(m) }, function() {
-			$scope.featured = metas;
-			metas.forEach(function(x) { x.featured = true });
-			!$scope.$$phase && $scope.$digest();            
-		});
-	}), 400);
-	*/
 
 	return self;
 }]); 
