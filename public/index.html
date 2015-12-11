@@ -11,7 +11,7 @@
 	</style>
 </head>
 
-<body ng-app="app" class="ng-hide" ng-controller="mainController" ng-cloak ng-show="true">
+<body ng-app="app" class="ng-hide" ng-cloak ng-show="true">
 	<div id="header">
 		<ul class="nav nav-pills">
 			<li ng-click="view='addons'" ng-class="{ active: view == 'addons' }"><a>Add-ons</a></li>
@@ -21,7 +21,7 @@
 		</ul>
 	</div>
 
-	<div id="discover" ng-show="view=='discover'">
+	<div id="discover" ng-show="view=='discover'" ng-controller="discoverCtrl">
 		<div class="row">
 			<div class="col-xs-2">
 				<ul class="nav nav-pills nav-stacked cat-types">
@@ -53,7 +53,8 @@
 					<p>No items to display</p>
 				</div>
 			</div>
-			<div class="col-xs-3" ng-show="selected.item">
+			
+			<div class="col-xs-3" ng-show="selected.item" ng-controller='infobarCtrl'>
 				<div class="panel panel-default movie-info affix">
 					<div class="panel-body" style="position: relative; font-size: 13px;">
 						<h2 class="text-uppercase"> {{selected.item.name}}</h2>

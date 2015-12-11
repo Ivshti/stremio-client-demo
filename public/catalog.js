@@ -148,8 +148,7 @@ app.run(['$rootScope', function($scope) {
 
 }]);
 
-app.controller('mainController', ['Items', 'stremio', '$scope', '$timeout', '$window', 'requests', function mainController(Items, stremio, $scope, $timeout, $window, requests) {
-
+app.controller('discoverCtrl', ['Items', 'stremio', '$scope', function mainController(Items, stremio, $scope) {
 	$scope.selected = { type: "movie", genre: null }; // selected category, genre
 	$scope.isLoading = function() { return Items.loading };
 
@@ -180,6 +179,10 @@ app.controller('mainController', ['Items', 'stremio', '$scope', '$timeout', '$wi
 		return imdb_proxy + encodeURIComponent(url.split("/").slice(0,-1).join("/") + "/" + splitted[0] + "._V1._SX" + width + "_CR0,0," + width + "," + height + "_.jpg");
 	};
 
+	return self;
+}]); 
+
+app.controller('infobarCtrl', ['stremio', '$scope', 'requests', function(stremio, $scope, requests) {
 	// Get all streams for an item; belongs to infobar
 	var delayedDigest = _.debounce(function() { !$scope.$phase && $scope.$digest() }, 300);
 	$scope.$watch(function() { return $scope.selected.item && $scope.selected.item.id }, function() {
@@ -202,17 +205,12 @@ app.controller('mainController', ['Items', 'stremio', '$scope', '$timeout', '$wi
 	}, true);
 
 
-	// This has to be in another scope; infobar or something like that
 	$scope.getVidName = function(vid) {
 		if (vid.hasOwnProperty("season")) return "("+vid.season+"x"+vid.number+") "+vid.name;
 		else return vid.title;
 	};
 
-	// Again, infobar
     $scope.streamName = function(stream) {
         return stream.name || (stream.addon && stream.addon.manifest && stream.addon.manifest.name) || (stream.addon && stream.addon.url)
     };
-
-	return self;
-}]); 
-
+}]);
