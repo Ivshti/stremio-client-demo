@@ -11,7 +11,7 @@
 	</style>
 </head>
 
-<body ng-app="catalog" class="ng-hide" ng-controller="CatalogController as Catalog" ng-cloak ng-show="true">
+<body ng-app="app" class="ng-hide" ng-controller="mainController" ng-cloak ng-show="true">
 	<div id="header">
 		<ul class="nav nav-pills">
 			<li ng-click="view='addons'" ng-class="{ active: view == 'addons' }"><a>Add-ons</a></li>
@@ -25,22 +25,22 @@
 		<div class="row">
 			<div class="col-xs-2">
 				<ul class="nav nav-pills nav-stacked cat-types">
-					<li ng-repeat="(key, val) in Catalog.catTypes" ng-class="{'active': selected.type === key}"><a href="" ng-click="selected.type = key">{{val.name}}</a></li>
+					<li ng-repeat="(key, val) in catTypes" ng-class="{'active': selected.type === key}"><a href="" ng-click="selected.type = key">{{val.name}}</a></li>
 				</ul>
 				<br>
 				<ul class="nav nav-pills nav-stacked cat-genres">
 					<li ng-class="{'active': !selected.genre}"><a href="" ng-click="selected.genre = null">Top</a></li>
-					<li ng-repeat="(genre, _) in Catalog.genres[selected.type]" ng-class="{'active': selected.genre === genre}"><a href="" ng-click="selected.genre = genre">{{genre}}</a></li>
+					<li ng-repeat="(genre, _) in genres[selected.type]" ng-class="{'active': selected.genre === genre}"><a href="" ng-click="selected.genre = genre">{{genre}}</a></li>
 				</ul>
 			</div>
 			<div class="col-xs-7">
-				<div class="row catalog" ng-show="Catalog.items">
-					<div ng-repeat="res in Catalog.items" ng-if="res.poster" class="col-xs-4 col-lg-3 nopadding" >
+				<div class="row catalog" ng-show="items">
+					<div ng-repeat="res in items" ng-if="res.poster" class="col-xs-4 col-lg-3 nopadding" >
 						<div class="panel" ng-class="res.id == selected.item.id ? 'panel-primary' : ''">
 							<a href="" ng-click="selected.item = res">
 								<img class="img-responsive" ng-src="{{formatImgURL(res.poster, 210, 300) || 'no-poster.jpg'}}" alt="{{res.name}}" />
 							</a>
-							<a ng-cloak class="play-button" href="#" ng-click="Catalog.playMovie(res)" ng-show="res.id == selected.item.id">
+							<a ng-cloak class="play-button" href="#" ng-show="res.id == selected.item.id">
 								<img src="play_circle.png" alt="Play"/>
 							</a>
 						</div>
@@ -49,7 +49,7 @@
 				<div ng-show="isLoading()">
 					<p><i class="fa fa-cog fa-spin"></i> Loading...</p>
 				</div>
-				<div ng-hide="Catalog.items.length || isLoading()">
+				<div ng-hide="items.length || isLoading()">
 					<p>No items to display</p>
 				</div>
 			</div>

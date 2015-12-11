@@ -1,12 +1,12 @@
-var Catalog = angular.module('catalog', []);
+var app = angular.module('app', []);
 
 // Allow stremio:// and magnet:// protocols
-Catalog.config([ '$compileProvider', function($compileProvider) {   
+app.config([ '$compileProvider', function($compileProvider) {   
 	$compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|stremio|magnet):/);
 }]);
 
 // Initiate the client to the add-ons
-Catalog.factory("stremio", ["$http", "$rootScope", "$location", function($http, $scope, $location) {
+app.factory("stremio", ["$http", "$rootScope", "$location", function($http, $scope, $location) {
 	var Stremio = require("stremio-addons");
 	var stremio = new Stremio.Client();
 
@@ -35,7 +35,7 @@ Catalog.factory("stremio", ["$http", "$rootScope", "$location", function($http, 
 }]);
 
 // Requests: this is for requesting streams from the add-ons system
-Catalog.factory("requests", ["stremio", function(stremio) {	
+app.factory("requests", ["stremio", function(stremio) {	
 	var requests = { };
 	var EventEmitter = require("EventEmitter");
     requests.candidates = function(args, callback, offlineOnly)
@@ -87,7 +87,7 @@ Catalog.factory("requests", ["stremio", function(stremio) {
 
 // Metadata model
 var useAsId = ["imdb_id", "yt_id", "filmon_id", "streamfeed_id"]; // TODO: load from add-ons
-Catalog.factory('metadata', function() {
+app.factory('metadata', function() {
 	return function metadata(meta) {
 		var self = this;
 		_.extend(self, meta);
@@ -107,7 +107,7 @@ Catalog.factory('metadata', function() {
 	};
 });
 
-Catalog.factory('Items', [ 'stremio', 'metadata', '$rootScope', '$location', function(stremio, metadata, $scope, $location) {
+app.factory('Items', [ 'stremio', 'metadata', '$rootScope', '$location', function(stremio, metadata, $scope, $location) {
 	var self = { loading: true };
 
 	var genres = self.genres = { };
@@ -143,33 +143,30 @@ Catalog.factory('Items', [ 'stremio', 'metadata', '$rootScope', '$location', fun
 	return self;
 }]);
 
-Catalog.run(['$rootScope', function($scope) {
+app.run(['$rootScope', function($scope) {
 	$scope.view = "discover";
-	
+
 }]);
 
-Catalog.controller('CatalogController', ['Items', 'stremio', '$scope', '$timeout', '$window', 'requests', function CatalogController(Items, stremio, $scope, $timeout, $window, requests) {
-	var self = this;
-
-	self.query = ''; // TODO: search
+app.controller('mainController', ['Items', 'stremio', '$scope', '$timeout', '$window', 'requests', function mainController(Items, stremio, $scope, $timeout, $window, requests) {
 
 	$scope.selected = { type: "movie", genre: null }; // selected category, genre
 	$scope.isLoading = function() { return Items.loading };
 
-	self.catTypes = {
+	$scope.catTypes = {
 		movie: { name: 'Movies' },
 		series: { name: 'TV Shows' },
 		channel: { name: 'Channel' },
 		tv: { name: 'TV channels' },
 	};
-	self.genres = Items.genres;
+	$scope.genres = Items.genres;
 
 	$scope.$watchCollection(function() { return [$scope.selected.type, $scope.selected.genre, Items.all().length] }, function() {
-		self.items = Items.all().filter(function(x) { 
+		$scope.items = Items.all().filter(function(x) { 
 			return (x.type == $scope.selected.type) && 
 				(!$scope.selected.genre || (x.genre && x.genre.indexOf($scope.selected.genre) > -1))
 		});
-		$scope.selected.item = self.items[0];
+		$scope.selected.item = $scope.items[0];
 	});
 
 	var imdb_proxy = '/poster/';
