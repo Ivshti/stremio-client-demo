@@ -90,14 +90,18 @@
 								<td>
 									<!-- stream name - usually the add-on name -->
 									<div>{{streamName(stream)}}</div>
-									
+
+									<!-- stream title, usually something like 'SD' or 'HD' -->
+									<div>{{streamTitle(stream)}}</div>
+
 									<div ng-if="stream.hasOwnProperty('isSubscription') || stream.hasOwnProperty('isFree')">{{stream.isSubscription ? 'subscription' : (stream.isFree ? 'free' : '')}}</div>
 
 									<div class='tags'>Tags: {{stream.tag.join(", ")}}</div>
 
-									<div class="link" ng-show="stream.infoHash"><a target="_blank" ng-href="magnet:?xt=urn:btih:{{stream.infoHash}}">{{stream.infoHash}} / {{stream.mapIdx}}</a></div>
+									<div class="link" ng-show="stream.infoHash"><a target="_blank" ng-href="magnet:?xt=urn:btih:{{stream.infoHash}}">{{stream.infoHash}} {{stream.hasOwnProperty('mapIdx') ? ' / '+stream.mapIdx : ''}}</a></div>
 									<div class="link" ng-show="stream.url"><a target="_blank" ng-href="{{stream.url}}">{{stream.url}}</a></div>
 									<div class="link" ng-show="stream.externalUrl"><a target="_blank" ng-href="{{stream.externalUrl}}">external link to {{stream.externalUrl.split("/")[2]}}</a></div>
+									<div class="link" ng-show="stream.yt_id"><a target="_blank" ng-href="http://youtube.com/watch?v={{stream.yt_id}}">link to YouTube</a></div>
 
 								</td>
 
