@@ -109,11 +109,17 @@ app.factory('metadata', function() {
 	};
 });
 
-app.factory('Items', [ 'stremio', 'metadata', '$rootScope', '$location', function(stremio, metadata, $scope, $location) {
-	var self = { loading: true };
 
-	var genres = self.genres = { };
-	var items = [];
+app.run(['$rootScope', function($scope) {
+	$scope.view = "discover";
+
+}]);
+
+app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainController(stremio, $scope, metadata) {
+	$scope.selected = { type: "movie", genre: null }; // selected category, genre
+	
+	var loading = true, genres = $scope.genres = { }, items = [];
+	$scope.isLoading = function() { return loading };
 
 	var delayedApply = _.debounce(function() { !$scope.$phase && $scope.$apply() }, 300);
 
@@ -123,7 +129,7 @@ app.factory('Items', [ 'stremio', 'metadata', '$rootScope', '$location', functio
 		types.forEach(function(type) {
 			// Query for each type - the add-ons client will automagically decide which add-on to pick for each type
 			stremio.meta.find({ query: { type: type }, limit: 200, skip: 0, complete: true, popular: true, projection: "lean" }, function(err, r, addon) {
-				if (++i == types.length) self.loading = false;
+				if (++i == types.length) loading = false;
 				delayedApply();
 
 				if (!r) return;
@@ -140,30 +146,15 @@ app.factory('Items', [ 'stremio', 'metadata', '$rootScope', '$location', functio
 		});
 	}, 500), true);
 
-	self.all = function() { return items };
-
-	return self;
-}]);
-
-app.run(['$rootScope', function($scope) {
-	$scope.view = "discover";
-
-}]);
-
-app.controller('discoverCtrl', ['Items', 'stremio', '$scope', function mainController(Items, stremio, $scope) {
-	$scope.selected = { type: "movie", genre: null }; // selected category, genre
-	$scope.isLoading = function() { return Items.loading };
-
 	$scope.catTypes = {
 		movie: { name: 'Movies' },
 		series: { name: 'TV Shows' },
 		channel: { name: 'Channel' },
 		tv: { name: 'TV channels' },
 	};
-	$scope.genres = Items.genres;
 
-	$scope.$watchCollection(function() { return [$scope.selected.type, $scope.selected.genre, Items.all().length] }, function() {
-		$scope.items = Items.all().filter(function(x) { 
+	$scope.$watchCollection(function() { return [$scope.selected.type, $scope.selected.genre, items.length] }, function() {
+		$scope.items = items.filter(function(x) { 
 			return (x.type == $scope.selected.type) && 
 				(!$scope.selected.genre || (x.genre && x.genre.indexOf($scope.selected.genre) > -1))
 		});
