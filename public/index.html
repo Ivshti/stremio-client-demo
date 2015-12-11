@@ -14,19 +14,20 @@
 <body ng-app="catalog" class="ng-hide" ng-controller="CatalogController as Catalog" ng-cloak ng-show="true">
 	<div id="header">
 		<ul class="nav nav-pills">
-			<li><a>Add-ons</a></li>
-			<li><a>Discover</a></li>
-			<li><a>Search</a></li>
+			<li ng-click="view='addons'" ng-class="{ active: view == 'addons' }"><a>Add-ons</a></li>
+			<li ng-click="view='discover'" ng-class="{ active: view == 'discover' }"><a>Discover</a></li>
+			<li ng-click="view='search'" ng-class="{ active: view == 'search' }"><a>Search</a></li>
 
 		</ul>
 	</div>
 
-	<div id="discover">
+	<div id="discover" ng-show="view=='discover'">
 		<div class="row">
 			<div class="col-xs-2">
 				<ul class="nav nav-pills nav-stacked cat-types">
 					<li ng-repeat="(key, val) in Catalog.catTypes" ng-class="{'active': selected.type === key}"><a href="" ng-click="selected.type = key">{{val.name}}</a></li>
 				</ul>
+				<br>
 				<ul class="nav nav-pills nav-stacked cat-genres">
 					<li ng-class="{'active': !selected.genre}"><a href="" ng-click="selected.genre = null">Top</a></li>
 					<li ng-repeat="(genre, _) in Catalog.genres[selected.type]" ng-class="{'active': selected.genre === genre}"><a href="" ng-click="selected.genre = genre">{{genre}}</a></li>

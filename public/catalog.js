@@ -143,6 +143,10 @@ Catalog.factory('Items', [ 'stremio', 'metadata', '$rootScope', '$location', fun
 	return self;
 }]);
 
+Catalog.run(['$rootScope', function($scope) {
+	$scope.view = "discover";
+	
+}]);
 
 Catalog.controller('CatalogController', ['Items', 'stremio', '$scope', '$timeout', '$window', 'requests', function CatalogController(Items, stremio, $scope, $timeout, $window, requests) {
 	var self = this;
