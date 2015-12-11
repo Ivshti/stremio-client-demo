@@ -125,9 +125,9 @@ app.run(['$rootScope', function($scope) {
 app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainController(stremio, $scope, metadata) {
 	var PAGE_LEN = 140;
 
-	$scope.selected = { type: "movie", genre: null, limit: PAGE_LEN }; // selected category, genre
-
 	$scope.sorts = [{ name: "Popularity", prop: "popularity" }];
+
+	$scope.selected = { type: "movie", genre: null, limit: PAGE_LEN, sort: $scope.sorts[0].prop }; // selected category, genre
 	
 	var loading = true, genres = $scope.genres = { }, items = [];
 
@@ -166,12 +166,13 @@ app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainCo
 	var askedFor;
 	$scope.$watchCollection(function() { return [$scope.selected.type, $scope.selected.genre, $scope.selected.sort] }, function() {
 		$scope.selected.limit = PAGE_LEN;
+		$scope.selected.sort = $scope.sorts[0].prop;
 		askedFor = PAGE_LEN;
 	});
 
 	// Update displayed items, load more items
-	$scope.$watchCollection(function() { return [$scope.selected.type, $scope.selected.genre, $scope.selected.limit, items.length] }, function() {		
-		$scope.items = items.filter(function(x) { 
+	$scope.$watchCollection(function() { return [$scope.selected.type, $scope.selected.genre, $scope.selected.sort, $scope.selected.limit, items.length] }, function() {		
+		$scope.items = _.sortByOrder(items, [$scope.selected.sort], ['desc']).filter(function(x) { 
 			return (x.type == $scope.selected.type) && 
 				(!$scope.selected.genre || (x.genre && x.genre.indexOf($scope.selected.genre) > -1))
 		}).slice(0, $scope.selected.limit);

@@ -40,6 +40,10 @@
 					<li ng-repeat="(key, val) in catTypes" ng-class="{'active': selected.type === key}"><a href="" ng-click="selected.type = key">{{val.name}}</a></li>
 				</ul>
 				<br>
+				<ul class="nav nav-pills nav-stacked cat-types">
+					<li ng-repeat="sort in sorts" ng-class="{'active': selected.sort === sort.prop}"><a href="" ng-click="selected.sort = sort.prop">Sort by {{sort.name}}</a></li>
+				</ul>
+				<br>
 				<ul class="nav nav-pills nav-stacked cat-genres">
 					<li ng-class="{'active': !selected.genre}"><a href="" ng-click="selected.genre = null">Top</a></li>
 					<li ng-repeat="(genre, _) in genres[selected.type]" ng-class="{'active': selected.genre === genre}"><a href="" ng-click="selected.genre = genre">{{genre}}</a></li>
