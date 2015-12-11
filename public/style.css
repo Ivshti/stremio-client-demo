@@ -55,6 +55,7 @@ h3{
 	box-shadow: 2px 2px 6px -2px gray;
 }
 
+
 .nopadding { padding: 0px; }
 
 .play-button { position: absolute; display: block; top:0; left:0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.3); }
@@ -81,6 +82,9 @@ h3{
 	font-weight: bold;
 	padding: 0;
 }
+
+.streams-table a { font-size: 11px; }
+.streams-tags { font-size: 12px;}
 
 .sidebar-values td { border-top: 0px !important; padding-top: 0px !important; }
 
