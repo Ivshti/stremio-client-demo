@@ -147,8 +147,6 @@ Catalog.factory('Items', [ 'stremio', 'metadata', '$rootScope', '$location', fun
 Catalog.controller('CatalogController', ['Items', 'stremio', '$scope', '$timeout', '$window', 'requests', function CatalogController(Items, stremio, $scope, $timeout, $window, requests) {
 	var self = this;
 
-	var imdb_proxy = '/poster/';
-
 	self.query = ''; // TODO: search
 
 	$scope.selected = { type: "movie", genre: null }; // selected category, genre
@@ -170,7 +168,18 @@ Catalog.controller('CatalogController', ['Items', 'stremio', '$scope', '$timeout
 		$scope.selected.item = self.items[0];
 	});
 
-	// Get all streams for an item
+	var imdb_proxy = '/poster/';
+	$scope.formatImgURL = function formatImgURL(url, width, height) {
+		if (!url || -1 === url.indexOf("imdb.com")) return url;
+
+		var splitted = url.split("/").pop().split(".");
+
+		if (1 === splitted.length) return url;
+
+		return imdb_proxy + encodeURIComponent(url.split("/").slice(0,-1).join("/") + "/" + splitted[0] + "._V1._SX" + width + "_CR0,0," + width + "," + height + "_.jpg");
+	};
+
+	// Get all streams for an item; belongs to infobar
 	var delayedDigest = _.debounce(function() { !$scope.$phase && $scope.$digest() }, 300);
 	$scope.$watch(function() { return $scope.selected.item && $scope.selected.item.id }, function() {
 		$scope.handle = null;
@@ -185,29 +194,20 @@ Catalog.controller('CatalogController', ['Items', 'stremio', '$scope', '$timeout
 			}
 		});
 	});
-
 	$scope.$watch(function() { return $scope.selected.video || $scope.selected.item }, function() {
 		$scope.handle = null;
 		if (! $scope.selected.item) return;
 		$scope.handle = requests.candidates({ query: $scope.selected.item.getQuery($scope.selected.video) }).on("updated", delayedDigest);
 	}, true);
 
-	// This is for another scope
+
+	// This has to be in another scope; infobar or something like that
 	$scope.getVidName = function(vid) {
 		if (vid.hasOwnProperty("season")) return "("+vid.season+"x"+vid.number+") "+vid.name;
 		else return vid.title;
 	};
 
-	$scope.formatImgURL = function formatImgURL(url, width, height) {
-		if (!url || -1 === url.indexOf("imdb.com")) return url;
-
-		var splitted = url.split("/").pop().split(".");
-
-		if (1 === splitted.length) return url;
-
-		return imdb_proxy + encodeURIComponent(url.split("/").slice(0,-1).join("/") + "/" + splitted[0] + "._V1._SX" + width + "_CR0,0," + width + "," + height + "_.jpg");
-	};
-
+	// Again, infobar
     $scope.streamName = function(stream) {
         return stream.name || (stream.addon && stream.addon.manifest && stream.addon.manifest.name) || (stream.addon && stream.addon.url)
     };
