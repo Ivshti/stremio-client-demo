@@ -90,10 +90,7 @@
 								<td>
 									<!-- stream name - usually the add-on name -->
 									<div>{{streamName(stream)}}</div>
-
-									<!-- stream title, usually something like 'SD' or 'HD' -->
-									<div>{{streamTitle(stream)}}</div>
-
+									
 									<div ng-if="stream.hasOwnProperty('isSubscription') || stream.hasOwnProperty('isFree')">{{stream.isSubscription ? 'subscription' : (stream.isFree ? 'free' : '')}}</div>
 
 									<div class='tags'>Tags: {{stream.tag.join(", ")}}</div>

@@ -211,9 +211,6 @@ Catalog.controller('CatalogController', ['Items', 'stremio', '$scope', '$timeout
     $scope.streamName = function(stream) {
         return stream.name || (stream.addon && stream.addon.manifest && stream.addon.manifest.name) || (stream.addon && stream.addon.url)
     };
-    $scope.streamTitle = function(stream) {
-        return stream.title || (stream.tag.indexOf("hd") > -1 ? "HD" : "SD");
-    };
 
 	return self;
 }]); 
