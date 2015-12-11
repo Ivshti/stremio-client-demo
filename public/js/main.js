@@ -113,39 +113,6 @@ app.factory('metadata', function() {
 app.run(['$rootScope', function($scope) {
 	$scope.view = "discover";
 
-}]);
-
-app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainController(stremio, $scope, metadata) {
-	$scope.selected = { type: "movie", genre: null }; // selected category, genre
-	
-	var loading = true, genres = $scope.genres = { }, items = [];
-	$scope.isLoading = function() { return loading };
-
-	var delayedApply = _.debounce(function() { !$scope.$phase && $scope.$apply() }, 300);
-
-	// Get all supported types of the stremio addons client - e.g. movie, series, channel
-	var types = [], i = 0;
-	$scope.$watch(function() { return types = Object.keys(stremio.supportedTypes).sort() }, _.debounce(function() {
-		types.forEach(function(type) {
-			// Query for each type - the add-ons client will automagically decide which add-on to pick for each type
-			stremio.meta.find({ query: { type: type }, limit: 200, skip: 0, complete: true, popular: true, projection: "lean" }, function(err, r, addon) {
-				if (++i == types.length) loading = false;
-				delayedApply();
-
-				if (!r) return;
-            	
-            	// Same message as Desktop app
-            	console.log("Discover pulled "+r.length+" items from "+(addon && addon.url));
-
-				items = items.concat(r.map(function(x) { return new metadata(x) }));
-				items.forEach(function(x) { 
-					if (! genres[x.type]) genres[x.type] = { };
-					if (x.genre) x.genre.forEach(function(g) { genres[x.type][g] = 1 });
-				});
-			});
-		});
-	}, 500), true);
-
 	$scope.catTypes = {
 		movie: { name: 'Movies' },
 		series: { name: 'TV Shows' },
@@ -153,24 +120,106 @@ app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainCo
 		tv: { name: 'TV channels' },
 	};
 
-	$scope.$watchCollection(function() { return [$scope.selected.type, $scope.selected.genre, items.length] }, function() {
+}]);
+
+app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainController(stremio, $scope, metadata) {
+	var PAGE_LEN = 140;
+
+	$scope.selected = { type: "movie", genre: null, limit: PAGE_LEN }; // selected category, genre
+	
+	var loading = true, genres = $scope.genres = { }, items = [];
+	$scope.isLoading = function() { return loading };
+
+	var delayedApply = _.debounce(function() { !$scope.$phase && $scope.$apply() }, 300);
+
+	// Get all supported types of the stremio addons client - e.g. movie, series, channel
+	function receiveItems(err, r, addon) {
+		if (err) console.error(err);
+		if (!r) return;
+    	
+    	delayedApply();
+
+    	// Same message as Desktop app
+    	console.log("Discover pulled "+r.length+" items from "+(addon && addon.url));
+
+		items = items.concat(r.map(function(x) { return new metadata(x) }));
+		items.forEach(function(x) { 
+			if (! genres[x.type]) genres[x.type] = { };
+			if (x.genre) x.genre.forEach(function(g) { genres[x.type][g] = 1 });
+		});
+	};
+
+	var types = [], i = 0;
+	$scope.$watch(function() { return types = Object.keys(stremio.supportedTypes).sort() }, _.debounce(function() {
+		types.forEach(function(type) {
+			// Query for each type - the add-ons client will automagically decide which add-on to pick for each type
+			stremio.meta.find({ query: { type: type }, limit: PAGE_LEN, skip: 0, complete: true, popular: true, projection: "lean" }, function(err, r, addon) {
+				if (++i == types.length) loading = false;
+				receiveItems(err, r, addon);
+			});
+		});
+	}, 500), true);
+
+	var askedFor;
+	$scope.$watchCollection(function() { return [$scope.selected.type, $scope.selected.genre, $scope.selected.sort] }, function() {
+		$scope.selected.limit = PAGE_LEN;
+		askedFor = PAGE_LEN;
+	});
+
+	$scope.$watchCollection(function() { return [$scope.selected.type, $scope.selected.genre, $scope.selected.limit, items.length] }, function() {		
 		$scope.items = items.filter(function(x) { 
 			return (x.type == $scope.selected.type) && 
 				(!$scope.selected.genre || (x.genre && x.genre.indexOf($scope.selected.genre) > -1))
-		});
+		}).slice(0, $scope.selected.limit);
 		$scope.selected.item = $scope.items[0];
+
+
+		var limit = $scope.selected.limit;
+		if ($scope.items.length<limit && askedFor != limit) stremio.meta.find({ 
+			query: _.pick(_.pick($scope.selected, "type", "genre"), _.identity),
+			limit: PAGE_LEN, skip: limit-PAGE_LEN
+		}, function(err, r, addon) {
+			askedFor = limit;
+			receiveItems(err, r, addon);
+		});
 	});
 
-	var imdb_proxy = '/poster/';
+	$scope.loadNextPage = function() {
+		$scope.selected.limit += PAGE_LEN;
+	}
+
+	var IMDB_PROXY = '/poster/';
 	$scope.formatImgURL = function formatImgURL(url, width, height) {
 		if (!url || -1 === url.indexOf("imdb.com")) return url;
 
 		var splitted = url.split("/").pop().split(".");
-
 		if (1 === splitted.length) return url;
 
-		return imdb_proxy + encodeURIComponent(url.split("/").slice(0,-1).join("/") + "/" + splitted[0] + "._V1._SX" + width + "_CR0,0," + width + "," + height + "_.jpg");
+		return IMDB_PROXY + encodeURIComponent(url.split("/").slice(0,-1).join("/") + "/" + splitted[0] + "._V1._SX" + width + "_CR0,0," + width + "," + height + "_.jpg");
 	};
+
+
+    // Featured content
+    // This can be done by listening to addon-ready much more easily
+     /*
+    var featuredIds = [];
+    $scope.featured = [];
+    $scope.$watchCollection(function() {
+        stremio.get().forEach(function(s) { 
+            if (s.manifest.featured && s.manifest.featured[stremio.countryCode]) featuredIds.push(s.manifest.featured[stremio.countryCode]);
+            if (s.manifest.featured && s.manifest.featured.ALL) featuredIds.push(s.manifest.featured.ALL);
+        });
+        featuredIds = _.chain(featuredIds).flatten().uniq().value();
+        return featuredIds;
+    }, _.debounce(function() {
+        var metas = [];
+        metadata.retrieveMany(featuredIds, false, function(id, m) { if (m) metas.push(m) }, function() {
+            $scope.featured = metas;
+            metas.forEach(function(x) { x.featured = true });
+            !$scope.$$phase && $scope.$digest();            
+        });
+    }), 400);
+	*/
 
 	return self;
 }]); 
