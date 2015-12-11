@@ -92,11 +92,13 @@ app.factory('metadata', function() {
 		var self = this;
 		_.extend(self, meta);
 
+		// auto-generate id from useAsId properties
 		Object.defineProperty(self, "id", { enumerable: true, get: function() {
 			if (self.imdb_id) return self.imdb_id;
 			for (var i=0; i!=useAsId.length; i++) if (self[useAsId[i]]) return useAsId[i]+":"+self[useAsId[i]];
 		} });
 		
+		// this gets passed to stream.find add-on method
 		self.getQuery = function(extra) {
 			var query = _.extend({ type: self.type }, _.pick(self, useAsId));
 			if (self.type == "series") _.extend(query, { season: 1, episode: 1 });
@@ -182,6 +184,10 @@ app.controller('discoverCtrl', ['Items', 'stremio', '$scope', function mainContr
 	return self;
 }]); 
 
+app.controller('searchCtrl', ['stremio', '$scope', function(stremio, $scope) {
+
+}]);
+
 app.controller('infobarCtrl', ['stremio', '$scope', 'requests', function(stremio, $scope, requests) {
 	// Get all streams for an item; belongs to infobar
 	var delayedDigest = _.debounce(function() { !$scope.$phase && $scope.$digest() }, 300);
@@ -214,3 +220,5 @@ app.controller('infobarCtrl', ['stremio', '$scope', 'requests', function(stremio
         return stream.name || (stream.addon && stream.addon.manifest && stream.addon.manifest.name) || (stream.addon && stream.addon.url)
     };
 }]);
+
+app.controller('')
