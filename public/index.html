@@ -79,6 +79,7 @@
 							</td></tr>
 						</table>
 
+						<h3 class="text-uppercase" ng-if="handle.candidates">Streams</h3>
 						<table class="table table-borderless" ng-repeat="stream in handle.candidates">
 							<!--<tr>
 								<td><a title="click to watch with Stremio" ng-href="stremio://{{selected.item.stream.infoHash}}">{{selected.item.stream.infoHash}}</a></td>
@@ -87,12 +88,20 @@
 							<tr>
 
 								<td>
+									<!-- stream name - usually the add-on name -->
+									<div>{{streamName(stream)}}</div>
 
-									<div ng-show="stream.infoHash"><a target="_blank" ng-href="magnet:?xt=urn:btih:{{stream.infoHash}}">{{stream.infoHash}} / {{stream.mapIdx}}</a></div>
-									<div ng-show="stream.url"><a target="_blank" ng-href="{{stream.url}}">{{stream.url}}</a></div>
-									<div ng-show="stream.externalUrl"><a target="_blank" ng-href="{{stream.externalUrl}}">{{stream.externalUrl}}</a></div>
+									<!-- stream title, usually something like 'SD' or 'HD' -->
+									<div>{{streamTitle(stream)}}</div>
 
-									{{stream.tag.join(", ")}}
+									<div ng-if="stream.hasOwnProperty('isSubscription') || stream.hasOwnProperty('isFree')">{{stream.isSubscription ? 'subscription' : (stream.isFree ? 'free' : '')}}</div>
+
+									<div class='tags'>Tags: {{stream.tag.join(", ")}}</div>
+
+									<div class="link" ng-show="stream.infoHash"><a target="_blank" ng-href="magnet:?xt=urn:btih:{{stream.infoHash}}">{{stream.infoHash}} / {{stream.mapIdx}}</a></div>
+									<div class="link" ng-show="stream.url"><a target="_blank" ng-href="{{stream.url}}">{{stream.url}}</a></div>
+									<div class="link" ng-show="stream.externalUrl"><a target="_blank" ng-href="{{stream.externalUrl}}">external link to {{stream.externalUrl.split("/")[2]}}</a></div>
+
 								</td>
 
 							</tr>

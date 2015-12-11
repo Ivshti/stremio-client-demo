@@ -208,6 +208,13 @@ Catalog.controller('CatalogController', ['Items', 'stremio', '$scope', '$timeout
 		return imdb_proxy + encodeURIComponent(url.split("/").slice(0,-1).join("/") + "/" + splitted[0] + "._V1._SX" + width + "_CR0,0," + width + "," + height + "_.jpg");
 	};
 
+    $scope.streamName = function(stream) {
+        return stream.name || (stream.addon && stream.addon.manifest && stream.addon.manifest.name) || (stream.addon && stream.addon.url)
+    };
+    $scope.streamTitle = function(stream) {
+        return stream.title || (stream.tag.indexOf("hd") > -1 ? "HD" : "SD");
+    };
+
 	return self;
 }]); 
 
