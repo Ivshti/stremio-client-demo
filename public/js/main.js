@@ -172,7 +172,8 @@ app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainCo
 
 	// Update displayed items, load more items
 	$scope.$watchCollection(function() { return [$scope.selected.type, $scope.selected.genre, $scope.selected.sort, $scope.selected.limit, items.length] }, function() {		
-		$scope.items = _.sortByOrder(items, [$scope.selected.sort], ['desc']).filter(function(x) { 
+		$scope.items = items //_.sortByOrder(items, [$scope.selected.sort], ['desc'])
+		.filter(function(x) { 
 			return (x.type == $scope.selected.type) && 
 				(!$scope.selected.genre || (x.genre && x.genre.indexOf($scope.selected.genre) > -1))
 		}).slice(0, $scope.selected.limit);
