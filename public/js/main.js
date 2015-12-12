@@ -140,7 +140,6 @@ app.factory('metadata', function() {
 			if (extra) _.extend(query, { yt_id: extra.id, season: extra.season, episode: extra.number });
 			return query;
 		};
-
 	};
 });
 
@@ -168,6 +167,7 @@ app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainCo
 			if (! genres[x.type]) genres[x.type] = { };
 			if (x.genre) x.genre.forEach(function(g) { genres[x.type][g] = 1 });
 		});
+		items = _.uniq(items, "id");
 	};
 
 	// Load initial data for each type
@@ -182,11 +182,15 @@ app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainCo
 		});
 	}, 500), true);
 
+	// Reset soort
+	$scope.$watchCollection("sorts", function() {
+		$scope.selected.sort = $scope.sorts[$scope.sorts.length-1].prop;
+	});
+
 	// Reset page on every change of type/genre/sort
-	var askedFor;
+	var askedFor, lastSort
 	$scope.$watchCollection(function() { return [$scope.selected.type, $scope.selected.genre, $scope.selected.sort, $scope.sorts.length] }, function() {
 		$scope.selected.limit = PAGE_LEN;
-		$scope.selected.sort = $scope.sorts[$scope.sorts.length-1].prop;
 		askedFor = PAGE_LEN;
 	});
 
@@ -197,18 +201,21 @@ app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainCo
 		$scope.items = _.sortBy(items, function(item) {
 			return -(sort.match("popularities.") ? item[sort.split(".")[1]] : item[sort]) // descending
 		})
-		.filter(function(x) { 
+		.filter(function(x) {
 			return (x.type == $scope.selected.type) && 
 				(!$scope.selected.genre || (x.genre && x.genre.indexOf($scope.selected.genre) > -1))
 		}).slice(0, $scope.selected.limit);
 		$scope.selected.item = $scope.items[0];
 
 		var limit = $scope.selected.limit;
-		if ($scope.items.length<limit && askedFor != limit) stremio.meta.find({ 
+		console.log(_.object([sort],[-1]))
+		if ( ($scope.items.length<limit && askedFor != limit) || sort != lastSort) stremio.meta.find({ 
 			query: _.pick(_.pick($scope.selected, "type", "genre"), _.identity),
-			limit: PAGE_LEN, skip: limit-PAGE_LEN
+			limit: PAGE_LEN, skip: limit-PAGE_LEN,
+			sort: _.object([sort],[-1])
 		}, function(err, r, addon) {
 			askedFor = limit;
+			lastSort = sort;
 			receiveItems(err, r, addon);
 		});
 	});
