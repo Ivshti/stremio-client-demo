@@ -260,6 +260,7 @@ app.controller('searchCtrl', ['stremio', 'metadata', '$scope', function(stremio,
 		$scope.searchQuery = ""; 
 		$scope.groups = [];
 		$scope.noResults = false;
+		$scope.selected.item = null;
 	};
 
 	$scope.$watch("searchQuery", function(s) { if(!s) $scope.closeSearch() });
