@@ -22,6 +22,31 @@
 		</ul>
 	</div>
 
+	<div id="addons" ng-show="view=='addons'" ng-controller='addonsCtrl'>
+			<h2>Loaded endpoints</h2>
+			<div class="row" ng-show="stremio.get().length">
+				<div ng-repeat="addon in stremio.get() track by addon.url" class="col-xs-4 col-lg-3 nopadding" >
+					<h2><b>{{addon.manifest.name}}</b> {{addon.manifest.version}}</h2>
+					<h3>{{addon.identifier()}}<br>{{addon.url}}</h3>
+				</div>
+			</div>
+
+			<hr></hr>
+
+			<h2>Enabled identifiers</h2>
+
+			<ul>
+				<li ng-repeat="identifier in identifiers()">
+					<!--<input type="checkbox" ng-model="activated[identifier]"></input>-->
+					{{identifier}}
+				</li>
+			</ul>
+
+			<hr></hr>
+
+		</div>
+	</div>
+
 	<div id="search" ng-show="view=='search'" ng-controller='searchCtrl'>
 		<div class="input-group">
 			<input type="text" placeholder="Search" class="form-control ng-valid ng-dirty ng-valid-parse ng-touched" id="ch_sfield" name="q" value="" ng-model="query">

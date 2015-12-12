@@ -249,4 +249,12 @@ app.controller('infobarCtrl', ['stremio', '$scope', 'requests', function(stremio
 	};
 }]);
 
-app.controller('')
+app.controller('addonsCtrl', ['stremio', '$scope', function(stremio, $scope) {
+	$scope.stremio = stremio;
+
+	$scope.enabled = { };
+
+	$scope.identifiers = function() {
+		return _.uniq(stremio.get().map(function(x) { return x.identifier() }))
+	};
+}])
