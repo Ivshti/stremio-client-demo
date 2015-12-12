@@ -5,6 +5,31 @@ app.config([ '$compileProvider', function($compileProvider) {
 	$compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|stremio|magnet):/);
 }]);
 
+
+app.run(['$rootScope', function($scope) {
+	$scope.view = "discover";
+
+	$scope.catTypes = {
+		movie: { name: 'Movies' },
+		series: { name: 'TV Shows' },
+		channel: { name: 'Channel' },
+		tv: { name: 'TV channels' },
+	};
+
+	$scope.sorts = [{ name: "Popularity", prop: "popularity" }];
+
+	var IMDB_PROXY = '/poster/';
+	$scope.formatImgURL = function formatImgURL(url, width, height) {
+		if (!url || -1 === url.indexOf("imdb.com")) return url;
+
+		var splitted = url.split("/").pop().split(".");
+		if (1 === splitted.length) return url;
+
+		return IMDB_PROXY + encodeURIComponent(url.split("/").slice(0,-1).join("/") + "/" + splitted[0] + "._V1._SX" + width + "_CR0,0," + width + "," + height + "_.jpg");
+	};
+
+}]);
+
 // Initiate the client to the add-ons
 app.factory("stremio", ["$http", "$rootScope", "$location", function($http, $scope, $location) {
 	var Stremio = require("stremio-addons");
@@ -33,7 +58,13 @@ app.factory("stremio", ["$http", "$rootScope", "$location", function($http, $sco
 	}).error(function(er) { console.error("add-ons tracker", er) });
 
 	// VERY important -  update the scope when a new add-on is ready
-	stremio.on("addon-ready", _.debounce(function() { !$scope.$phase && $scope.$apply() }, 300))
+	stremio.on("addon-ready", _.debounce(function() { !$scope.$phase && $scope.$apply() }, 300));
+
+	stremio.on("addon-ready", function(addon) {
+		var lid = addon.manifest.stremio_LID;
+		if (lid) $scope.sorts.push({ name: addon.manifest.name, prop: "popularities."+lid });
+		$scope.sorts = _.uniq($scope.sorts, "prop");
+	})
 
 	return stremio;
 }]);
@@ -113,34 +144,8 @@ app.factory('metadata', function() {
 	};
 });
 
-
-app.run(['$rootScope', function($scope) {
-	$scope.view = "discover";
-
-	$scope.catTypes = {
-		movie: { name: 'Movies' },
-		series: { name: 'TV Shows' },
-		channel: { name: 'Channel' },
-		tv: { name: 'TV channels' },
-	};
-
-
-	var IMDB_PROXY = '/poster/';
-	$scope.formatImgURL = function formatImgURL(url, width, height) {
-		if (!url || -1 === url.indexOf("imdb.com")) return url;
-
-		var splitted = url.split("/").pop().split(".");
-		if (1 === splitted.length) return url;
-
-		return IMDB_PROXY + encodeURIComponent(url.split("/").slice(0,-1).join("/") + "/" + splitted[0] + "._V1._SX" + width + "_CR0,0," + width + "," + height + "_.jpg");
-	};
-
-}]);
-
 app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainController(stremio, $scope, metadata) {
 	var PAGE_LEN = 140;
-
-	$scope.sorts = [{ name: "Popularity", prop: "popularity" }];
 
 	$scope.selected = { type: "movie", genre: null, limit: PAGE_LEN, sort: $scope.sorts[0].prop }; // selected category, genre
 	
@@ -179,15 +184,19 @@ app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainCo
 
 	// Reset page on every change of type/genre/sort
 	var askedFor;
-	$scope.$watchCollection(function() { return [$scope.selected.type, $scope.selected.genre, $scope.selected.sort] }, function() {
+	$scope.$watchCollection(function() { return [$scope.selected.type, $scope.selected.genre, $scope.selected.sort, $scope.sorts.length] }, function() {
 		$scope.selected.limit = PAGE_LEN;
-		$scope.selected.sort = $scope.sorts[0].prop;
+		$scope.selected.sort = $scope.sorts[$scope.sorts.length-1].prop;
 		askedFor = PAGE_LEN;
 	});
 
 	// Update displayed items, load more items
 	$scope.$watchCollection(function() { return [$scope.selected.type, $scope.selected.genre, $scope.selected.sort, $scope.selected.limit, items.length] }, function() {		
-		$scope.items = items //_.sortByOrder(items, [$scope.selected.sort], ['desc'])
+		var sort = $scope.selected.sort;
+
+		$scope.items = _.sortBy(items, function(item) {
+			return -(sort.match("popularities.") ? item[sort.split(".")[1]] : item[sort]) // descending
+		})
 		.filter(function(x) { 
 			return (x.type == $scope.selected.type) && 
 				(!$scope.selected.genre || (x.genre && x.genre.indexOf($scope.selected.genre) > -1))
@@ -222,8 +231,6 @@ app.controller('searchCtrl', ['stremio', 'metadata', '$scope', function(stremio,
 	$scope.results = { all: {}, prio: {} }; $scope.groups = [];
 
 	$scope.search = function() { 
-		console.log("search for "+$scope.searchQuery);
-
 		$scope.results = { all: {}, prio: {} }; $scope.groups = [];
 	
 		// get all meta.search-supporting add-ons		
@@ -252,7 +259,6 @@ app.controller('searchCtrl', ['stremio', 'metadata', '$scope', function(stremio,
 			.sortBy(function(group) { return $scope.results.prio[group.type] })
 			.value();
 		$scope.noResults = $scope.searchQuery && (all.length == 0);
-
 		$scope.selected.item = all[0];
 	};
 
