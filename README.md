@@ -1,6 +1,6 @@
 # stremio-addons-client
 An example client to the Stremio add-ons protocol, similar to Stremio's Discover
-
+![Stremio add-ons client](/screenshots/stremio-addons-client.png)
 
 ## What's this?
 It's an example client of the [stremio-addons](http://github.com/Stremio/stremio-addons) system (which is a multi-client RPC lib). 
