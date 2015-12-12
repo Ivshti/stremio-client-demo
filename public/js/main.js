@@ -124,6 +124,17 @@ app.run(['$rootScope', function($scope) {
 		tv: { name: 'TV channels' },
 	};
 
+
+	var IMDB_PROXY = '/poster/';
+	$scope.formatImgURL = function formatImgURL(url, width, height) {
+		if (!url || -1 === url.indexOf("imdb.com")) return url;
+
+		var splitted = url.split("/").pop().split(".");
+		if (1 === splitted.length) return url;
+
+		return IMDB_PROXY + encodeURIComponent(url.split("/").slice(0,-1).join("/") + "/" + splitted[0] + "._V1._SX" + width + "_CR0,0," + width + "," + height + "_.jpg");
+	};
+
 }]);
 
 app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainController(stremio, $scope, metadata) {
@@ -198,16 +209,6 @@ app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainCo
 	$scope.loadNextPage = function() {
 		$scope.selected.limit += PAGE_LEN;
 	}
-
-	var IMDB_PROXY = '/poster/';
-	$scope.formatImgURL = function formatImgURL(url, width, height) {
-		if (!url || -1 === url.indexOf("imdb.com")) return url;
-
-		var splitted = url.split("/").pop().split(".");
-		if (1 === splitted.length) return url;
-
-		return IMDB_PROXY + encodeURIComponent(url.split("/").slice(0,-1).join("/") + "/" + splitted[0] + "._V1._SX" + width + "_CR0,0," + width + "," + height + "_.jpg");
-	};
 
 	return self;
 }]); 
