@@ -58,13 +58,27 @@
 	</div>
 
 	<div id="search" ng-show="view=='search'" ng-controller='searchCtrl'>
-		<div class="input-group">
-			<input type="text" placeholder="Search" class="form-control ng-valid ng-dirty ng-valid-parse ng-touched" id="ch_sfield" name="q" value="" ng-model="query">
+		<form class="input-group" ng-submit="search()">
+			<input type="text" placeholder="Search" class="form-control ng-valid ng-dirty ng-valid-parse ng-touched" id="ch_sfield" name="q" value="" ng-model="searchQuery">
 			<span class="input-group-btn">
 				<button type="submit" class="btn btn-default" value="Search" style="border-left: none;">
 				<span class="fa fa-search purple"></span>
 				</button>
 			</span>
+		</form>
+
+		<div class="row catalog" ng-repeat="group in groups">
+			<h2>{{group.type}}</h2>
+			<div ng-repeat="res in group.items" ng-if="res.poster" class="col-xs-4 col-lg-3 nopadding" >
+				<div class="panel" ng-class="res.id == selected.item.id ? 'panel-primary' : ''">
+					<a href="" ng-click="selected.item = res">
+						<img class="img-responsive" ng-src="{{formatImgURL(res.poster, 210, 300) || 'no-poster.jpg'}}" alt="{{res.name}}" />
+					</a>
+					<a ng-cloak class="play-button" href="#" ng-show="res.id == selected.item.id">
+						<img src="play_circle.png" alt="Play"/>
+					</a>
+				</div>
+			</div>
 		</div>
 	</div>
 
