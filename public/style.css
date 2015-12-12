@@ -30,6 +30,14 @@ body {
 	padding-top: 40px;
 }
 
+#addons .type {
+	color: #7F2CAC;
+	font-weight: bold;
+}
+#addons h2, #addons h3, #addons h4 {
+	padding-left: 0px;
+}
+
 h1{
 	font-size: 20px;
 	margin: 0 0;
@@ -53,6 +61,7 @@ h3{
 .catalog .panel-primary {
 	box-shadow: 2px 2px 6px -2px gray;
 }
+
 
 
 .nopadding { padding: 0px; }
