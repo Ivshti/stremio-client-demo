@@ -23,9 +23,9 @@ npm start
 
 **Stremio add-ons extend Stremio with content.**
 
-That means either adding items to Discover or providing sources to stream content from.
+That means either adding items to Discover or providing sources to stream content farom.
 
-Unlike regular software plugins, Stremio addons **do not run inside Stremio**, but instead are **accessed through HTTP over network**. You can think of them as **RSS on steroids**. Multiple addons can be activated, providing you more content, without any installation / security risks.
+Unlike regular software plugins, Stremio addons **do not run inside Stremio**, but instead are **accessed through HTTP over network**. You can think of them as **RSS on steroids**. Multiple addons can be activated, providing you more content, without installation or security risks.
 
 
 ## Does it use the same logic as the desktop app?
