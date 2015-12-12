@@ -1,5 +1,5 @@
 # stremio-addons-client
-An example client to the Stremio add-ons protocol, similar to Stremio's Discover
+An example client to the Stremio add-ons protocol, similar to Stremio's Discover. Because the desktop app is nothing more but a client to the add-ons system, this is basically **an open-source Stremio**.
 ![Stremio add-ons client](/screenshots/stremio-addons-client.png)
 
 ## What's this?
