@@ -253,7 +253,7 @@ app.controller('searchCtrl', ['stremio', 'metadata', '$scope', function(stremio,
 			.value();
 		$scope.noResults = $scope.searchQuery && (all.length == 0);
 
-		console.log($scope.groups)
+		$scope.selected.item = all[0];
 	};
 
 	$scope.closeSearch = function() {
