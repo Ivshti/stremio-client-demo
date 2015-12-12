@@ -44,11 +44,12 @@ app.factory("stremio", ["$http", "$rootScope", "$location", function($http, $sco
 
 	var add = stremio.add.bind(stremio);
 
+	stremio.official.forEach(add);
+
+	// Must be after official
 	var addonUrl = $location.search().addon;
 	console.log("Adding add-on "+addonUrl);
 	if (addonUrl) add(addonUrl);
-
-	stremio.official.forEach(add);
 
 	// Load add-ons from the central tracker
 	$http.get("http://api9.strem.io/addons5").success(function(res) {
@@ -127,6 +128,8 @@ app.factory('metadata', function() {
 		var self = this;
 		_.extend(self, meta);
 
+		self.popularities = self.popularities || {};
+
 		// auto-generate id from useAsId properties
 		Object.defineProperty(self, "id", { enumerable: true, get: function() {
 			if (self.imdb_id) return self.imdb_id;
@@ -162,12 +165,13 @@ app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainCo
 		// Same message as Desktop app
 		console.log("Discover pulled "+r.length+" items from "+(addon && addon.url));
 
-		items = items.concat(r.map(function(x) { return new metadata(x) }));
+		var m = _.indexBy(items, "id");
+		r.forEach(function(x) { var meta = new metadata(x); m[meta.id] = meta });
+		items = _.values(m);
 		items.forEach(function(x) { 
 			if (! genres[x.type]) genres[x.type] = { };
 			if (x.genre) x.genre.forEach(function(g) { genres[x.type][g] = 1 });
 		});
-		items = _.uniq(items, "id");
 	};
 
 	// Load initial data for each type
@@ -182,7 +186,7 @@ app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainCo
 		});
 	}, 500), true);
 
-	// Reset soort
+	// Reset sort
 	$scope.$watchCollection("sorts", function() {
 		$scope.selected.sort = $scope.sorts[$scope.sorts.length-1].prop;
 	});
@@ -199,7 +203,7 @@ app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainCo
 		var sort = $scope.selected.sort;
 
 		$scope.items = _.sortBy(items, function(item) {
-			return -(sort.match("popularities.") ? item[sort.split(".")[1]] : item[sort]) // descending
+			return -(sort.match("popularities") ? item.popularities[sort.split(".")[1]] : item[sort]) // descending
 		})
 		.filter(function(x) {
 			return (x.type == $scope.selected.type) && 
@@ -208,7 +212,6 @@ app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainCo
 		$scope.selected.item = $scope.items[0];
 
 		var limit = $scope.selected.limit;
-		console.log(_.object([sort],[-1]))
 		if ( ($scope.items.length<limit && askedFor != limit) || sort != lastSort) stremio.meta.find({ 
 			query: _.pick(_.pick($scope.selected, "type", "genre"), _.identity),
 			limit: PAGE_LEN, skip: limit-PAGE_LEN,
@@ -290,7 +293,10 @@ app.controller('infobarCtrl', ['stremio', '$scope', 'requests', function(stremio
 
 		stremio.meta.get({ query: $scope.selected.item.getQuery() }, function(err, fullmeta) {
 			if (fullmeta && $scope.selected.item) { 
+				var p = $scope.selected.item.popularities;
 				_.extend($scope.selected.item, fullmeta);
+				_.extend($scope.selected.item, { popularities: _.extend(p, fullmeta.popularities) }); // merge that prop
+
 				delayedDigest();
 				$scope.selected.video = fullmeta.episodes ? fullmeta.episodes[0] : (fullmeta.uploads ? fullmeta.uploads[0] : null);
 			}
