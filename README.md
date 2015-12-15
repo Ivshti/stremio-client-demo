@@ -51,6 +51,6 @@ Use the guidelines at [stremio-addons](http://github.com/Stremio/stremio-addons)
 
 You can and should use this module to test your add-on before trying it in Stremio, because this module is open-source and you can see what calls it makes to your add-on and why.
 
-To do that, add your add-on's local endpoint (e.g. http://localhost:5555) via the bar on the bottom of the Add-ons tab:
+To **enable your add-on**, add it's local endpoint (e.g. http://localhost:5555) via the bar on the bottom of the Add-ons tab:
 
 ![Enable custom add-on](/screenshots/enable-addon.png)
