@@ -1,6 +1,6 @@
 
 // Metadata model
-var useAsId = ["imdb_id", "yt_id", "filmon_id", "streamfeed_id"]; // TODO: load from add-ons
+var useAsId = ["imdb_id", "yt_id", "filmon_id"];
 app.factory('metadata', function() {
 	return function metadata(meta) {
 		var self = this;
@@ -8,9 +8,11 @@ app.factory('metadata', function() {
 
 		self.popularities = self.popularities || {};
 
-		// auto-generate id from useAsId properties
+		// auto-generate id from useAsId properties or generic "id" property
+		var usableId = (self.id && self.id.split(":").length == 2) ? self.id : null;
 		Object.defineProperty(self, "id", { enumerable: true, get: function() {
 			if (self.imdb_id) return self.imdb_id;
+			if (usableId) return usableId;
 			for (var i=0; i!=useAsId.length; i++) if (self[useAsId[i]]) return useAsId[i]+":"+self[useAsId[i]];
 		} });
 		
