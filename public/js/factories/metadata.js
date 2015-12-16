@@ -16,9 +16,14 @@ app.factory('metadata', function() {
 			for (var i=0; i!=useAsId.length; i++) if (self[useAsId[i]]) return useAsId[i]+":"+self[useAsId[i]];
 		} });
 		
+		var getIdFromStr = function(str) {
+			if (str.match("^tt")) return { imdb_id: str };
+			if (str.match(":")) return _.object([ str.split(":")[0] ], [ str.split(":")[1] ]); // generic
+		}
+
 		// this gets passed to stream.find add-on method
 		self.getQuery = function(extra) {
-			var query = _.extend({ type: self.type }, _.pick(self, useAsId));
+			var query = _.extend({ type: self.type }, getIdFromStr(this.id));
 			if (self.type == "series") _.extend(query, { season: 1, episode: 1 });
 			if (extra) _.extend(query, { yt_id: extra.id, season: extra.season, episode: extra.number });
 			return query;
