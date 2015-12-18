@@ -45,7 +45,7 @@ Unlike regular software plugins, Stremio addons **do not run inside Stremio**, b
 Coming soon: public domain movies, YouTube channels
 
 
-## How yo create my own add-on?
+## How to create my own add-on?
 ### [Follow the guidelines here.](https://github.com/Stremio/stremio-addons/blob/master/documentation/home.md)
 
 ## How to use this to test my add-on
