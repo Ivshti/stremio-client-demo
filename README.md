@@ -45,9 +45,10 @@ Unlike regular software plugins, Stremio addons **do not run inside Stremio**, b
 Coming soon: public domain movies, YouTube channels
 
 
-## How to develop my own add-on?
+## How yo create my own add-on?
+### [Follow the guidelines here.](https://github.com/Stremio/stremio-addons/blob/master/documentation/home.md)
 
-Use the guidelines at [stremio-addons](http://github.com/Stremio/stremio-addons) - this module is the 'glue' between Stremio and the add-ons. 
+## How to use this to test my add-on
 
 You can and should use this module to test your add-on before trying it in Stremio, because this module is open-source and you can see what calls it makes to your add-on and why.
 
