@@ -31,8 +31,13 @@ app.factory("stremio", ["$http", "$rootScope", "$location", function($http, $sco
 	stremio.on("addon-ready", _.debounce(function() { !$scope.$phase && $scope.$apply() }, 300));
 
 	stremio.on("addon-ready", function(addon) {
+		// Old, LID-based sort
 		var lid = addon.manifest.stremio_LID;
 		if (lid) $scope.sorts.push({ name: addon.manifest.sortName || addon.manifest.name, prop: "popularities."+lid });
+		
+		// New .sorts property
+		if (Array.isArray(addon.manifest.sorts)) $scope.sorts = $scope.sorts.concat(addon.manifest.sorts);
+		
 		$scope.sorts = _.uniq($scope.sorts, "prop");
 	})
 
