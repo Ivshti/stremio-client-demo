@@ -10,6 +10,7 @@ app.factory("stremio", ["$http", "$rootScope", "$location", function($http, $sco
 	// Hardcode default official Stremio add-ons - Cinemeta (IMDB metadata), Guidebox (iTunes/Hulu/Netflix/etc. links), Channels (YouTube), Filmon
 	stremio.official = ["http://cinemeta.strem.io/stremioget", "http://guidebox.strem.io/stremioget", "http://channels.strem.io/stremioget", "http://filmon.strem.io/stremioget"];
 	stremio.thirdparty = [];
+	stremio.all = [];
 
 	var add = stremio.add.bind(stremio);
 
@@ -24,6 +25,7 @@ app.factory("stremio", ["$http", "$rootScope", "$location", function($http, $sco
 	$http.get("http://api9.strem.io/addons5").success(function(res) {
 		stremio.official = res.official;
 		stremio.thirdparty = res.thirdparty;
+		stremio.all = res.responding || [];
 		res.official.forEach(add); res.thirdparty.forEach(add);
 	}).error(function(er) { console.error("add-ons tracker", er) });
 
