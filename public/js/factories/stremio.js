@@ -18,7 +18,7 @@ app.factory("stremio", ["$http", "$rootScope", "$location", function($http, $sco
 
 	// Must be after official
 	var addonUrl = $location.search().addon;
-	console.log("Adding add-on "+addonUrl);
+	if (addonUrl) console.log("Adding add-on "+addonUrl);
 	if (addonUrl) add(addonUrl);
 
 	// Load add-ons from the central tracker
