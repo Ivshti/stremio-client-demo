@@ -25,6 +25,6 @@
   "dependencies": {
     "express": "^4.13.3",
     "lodash": "^3.10.1",
-    "stremio-addons": "^1.18.3"
+    "stremio-addons": "^1.19.1"
   }
 }
