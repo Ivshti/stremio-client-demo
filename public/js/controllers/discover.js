@@ -60,7 +60,7 @@ app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainCo
 		var sort = $scope.selected.sort;
 
 		$scope.items = _.sortBy(items, function(item) {
-			return -(sort.match("popularities") ? item.popularities[sort.split(".")[1]] : item[sort]) // descending
+			return -(sort.match("popularities") ? (item.popularities && item.popularities[sort.split(".")[1]]) : item[sort]) // descending
 		})
 		.filter(function(x) {
 			return (x.type == $scope.selected.type) && 
