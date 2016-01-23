@@ -10,7 +10,7 @@ app.factory('metadata', ['$sce', function($sce) {
 
 		// auto-generate id from useAsId properties or generic "id" property
 		var usableId = (self.id && self.id.split(":").length == 2) ? self.id : null;
-		var getId = function() {
+		var getId = metadata.getMetaId = function() {
 			if (self.imdb_id) return self.imdb_id;
 			if (usableId) return usableId;
 			for (var i=0; i!=useAsId.length; i++) if (self[useAsId[i]]) return useAsId[i]+":"+self[useAsId[i]];
