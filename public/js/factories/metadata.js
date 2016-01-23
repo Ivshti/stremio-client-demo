@@ -36,7 +36,7 @@ app.factory('metadata', ['$sce', function($sce) {
 			if (! url.match(/imdb/)) return url;
 			var width = 210, height = 300; // TODO: respect size
 			//var width = 200, height = 296;
-			var poster = (url.split("@@")[0]+"@@._V1._SX"+width+"_CR0,0,"+width+"_.jpg");
+			var poster = (url.split("@@")[0]+"@@"+"._V1._SX" + width + "_CR0,0," + width + "," + height + "_.jpg");
 			return (window.location.hostname == "localhost" || window.cordova) ? poster : "/poster/"+encodeURIComponent(poster);
 		};
 
