@@ -1,7 +1,7 @@
 
 // Metadata model
 var useAsId = ["imdb_id", "yt_id", "filmon_id"];
-app.factory('metadata', function() {
+app.factory('metadata', ['$sce', function($sce) {
 	return function metadata(meta) {
 		var self = this;
 		_.extend(self, meta);
@@ -28,5 +28,25 @@ app.factory('metadata', function() {
 			if (extra) _.extend(query, { yt_id: extra.id, season: extra.season, episode: extra.number });
 			return query;
 		};
+
+		self.getPoster = function() {
+			//console.log(this.fanart) // TODO
+			var url = this.poster;
+			if (! url) return url;
+			if (! url.match(/imdb/)) return url;
+			var width = 210, height = 300; // TODO: respect size
+			//var width = 200, height = 296;
+			var poster = (url.split("@@")[0]+"@@._V1._SX"+width+"_CR0,0,"+width+"_.jpg");
+			return (window.location.hostname == "localhost" || window.cordova) ? poster : "/poster/"+encodeURIComponent(poster);
+		};
+
+		self.descriptionHTML = function() { 
+			return this.description && $sce.trustAsHtml(this.description
+				.replace(/\n/g, '<br>')
+				// .replace(new RegExp("(?:(?:https?|ftp|file)://|www\.|ftp\.)[-A-Z0-9+&@#/%=~_|$?!:,.]*[A-Z0-9+&@#/%=~_|$]", "gi"), function(match, c, offset, s) {
+				//     return "<a onclick='require(\"nw.gui\").Shell.openExternal(\""+(match.match("^http://") ? match : "http://"+match)+"\")'>"+match+"</a>";
+				// })
+			);
+		};
 	};
-});
+}]);
