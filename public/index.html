@@ -76,7 +76,7 @@
 							<a href="" ng-click="selected.item = item">
 								<img class="img-responsive" ng-src="{{::item.getPoster()}}" alt="{{::item.name}}" />
 							</a>
-							<a ng-cloak class="play-button" href="#" ng-show="::item.id == selected.item.id">
+							<a ng-cloak class="play-button" href="#" ng-show="item.id == selected.item.id">
 								<img src="play_circle.png" alt="Play"/>
 							</a>
 						</div>
