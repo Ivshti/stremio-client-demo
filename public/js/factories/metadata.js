@@ -10,11 +10,13 @@ app.factory('metadata', ['$sce', function($sce) {
 
 		// auto-generate id from useAsId properties or generic "id" property
 		var usableId = (self.id && self.id.split(":").length == 2) ? self.id : null;
-		Object.defineProperty(self, "id", { enumerable: true, get: function() {
+		var getId = function() {
 			if (self.imdb_id) return self.imdb_id;
 			if (usableId) return usableId;
 			for (var i=0; i!=useAsId.length; i++) if (self[useAsId[i]]) return useAsId[i]+":"+self[useAsId[i]];
-		} });
+		};
+		Object.defineProperty(self, "id", { enumerable: true, get: getId });
+		Object.defineProperty(self, "_id", { enumerable: true, get: getId });
 		
 		var getIdFromStr = function(str) {
 			if (str.match("^tt")) return { imdb_id: str };
