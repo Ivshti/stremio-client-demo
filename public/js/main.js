@@ -16,8 +16,6 @@ app.run(['$rootScope', function($scope) {
 		tv: { name: 'TV channels' },
 	};
 
-	$scope.sorts = [{ name: "Popularity", prop: "popularity" }];
-
 	var IMDB_PROXY = '/poster/';
 	$scope.formatImgURL = function formatImgURL(url, width, height) {
 		if (!url || -1 === url.indexOf("imdb.com")) return url;

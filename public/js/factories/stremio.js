@@ -1,8 +1,10 @@
 
 // Initiate the client to the add-ons
-app.factory("stremio", ["$http", "$rootScope", "$location", function($http, $scope, $location) {
+app.factory("stremio", ["$http", "$rootScope", "$location", function($http, $rootScope, $location) {
 	var Stremio = require("stremio-addons");
 	var stremio = new Stremio.Client();
+
+	stremio.sorts = [{ name: "Popularity", prop: "popularity" }];
 
 	// Default auth token for open-source projects ; not required for stremioget end-points
 	stremio.setAuth("http://api9.strem.io", "2a240788ce82492744cdd42ca434fc26848ec616");
@@ -29,18 +31,18 @@ app.factory("stremio", ["$http", "$rootScope", "$location", function($http, $sco
 		res.official.forEach(add); res.thirdparty.forEach(add);
 	}).error(function(er) { console.error("add-ons tracker", er) });
 
-	// VERY important -  update the scope when a new add-on is ready
-	stremio.on("addon-ready", _.debounce(function() { !$scope.$phase && $scope.$apply() }, 300));
+	// VERY important -  update the rootScope when a new add-on is ready
+	stremio.on("addon-ready", _.debounce(function() { !$rootScope.$phase && $rootScope.$apply() }, 300));
 
 	stremio.on("addon-ready", function(addon) {
 		// Old, LID-based sort
 		var lid = addon.manifest.stremio_LID;
-		if (lid) $scope.sorts.push({ name: addon.manifest.sortName || addon.manifest.name, prop: "popularities."+lid, types: addon.manifest.types });
+		if (lid) stremio.sorts.push({ name: addon.manifest.sortName || addon.manifest.name, prop: "popularities."+lid, types: addon.manifest.types });
 		
 		// New .sorts property
-		if (Array.isArray(addon.manifest.sorts)) $scope.sorts = $scope.sorts.concat(addon.manifest.sorts);
+		if (Array.isArray(addon.manifest.sorts)) stremio.sorts = stremio.sorts.concat(addon.manifest.sorts);
 		
-		$scope.sorts = _.uniq($scope.sorts, "prop");
+		stremio.sorts = _.uniq(stremio.sorts, "prop");
 	})
 
 	return stremio;
