@@ -40,10 +40,13 @@ app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainCo
 	}, 500), true);
 
 	// Reset sort
-	$scope.$watchCollection(function() { return stremio.sorts }, function() {
+	$scope.filterSort = function(type, x) { return !x.types || x.types.indexOf(type) > -1 };
+	var setSort = function() {
 		$scope.sorts = stremio.sorts;
-		$scope.selected.sort = stremio.sorts[stremio.sorts.length-1].prop;
-	});
+		$scope.selected.sort = stremio.sorts.filter($scope.filterSort.bind(null, $scope.selected.type)).pop().prop;
+	};
+	$scope.$watchCollection("sorts", setSort);
+	$scope.$watch("selected.type", setSort);
 
 	// Reset page on every change of type/genre/sort
 	var askedFor, lastSort

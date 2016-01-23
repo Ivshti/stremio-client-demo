@@ -98,7 +98,7 @@
 				</ul>
 				<br>
 				<ul class="nav nav-pills nav-stacked cat-types">
-					<li ng-repeat="sort in sorts" ng-class="{'active': selected.sort === sort.prop}"><a href="" ng-click="selected.sort = sort.prop">Sort by {{sort.name}}</a></li>
+					<li ng-repeat="sort in sorts" ng-class="{'active': selected.sort === sort.prop}" ng-show="filterSort(selected.type, sort)"><a href="" ng-click="selected.sort = sort.prop">Sort by {{sort.name}}</a></li>
 				</ul>
 				<br>
 				<ul class="nav nav-pills nav-stacked cat-genres">

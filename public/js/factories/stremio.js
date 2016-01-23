@@ -1,6 +1,6 @@
 
 // Initiate the client to the add-ons
-app.factory("stremio", ["$http", "$rootScope", "$location", function($http, $rootScope, $location) {
+app.factory("stremio", ["$http", "$rootScope", function($http, $scope) {
 	var Stremio = require("stremio-addons");
 	var stremio = new Stremio.Client();
 
@@ -18,17 +18,13 @@ app.factory("stremio", ["$http", "$rootScope", "$location", function($http, $roo
 
 	stremio.official.forEach(add);
 
-	// Must be after official
-	var addonUrl = $location.search().addon;
-	if (addonUrl) console.log("Adding add-on "+addonUrl);
-	if (addonUrl) add(addonUrl);
-
 	// Load add-ons from the central tracker
 	$http.get("http://api9.strem.io/addons5").success(function(res) {
 		stremio.official = res.official;
 		stremio.thirdparty = res.thirdparty;
 		stremio.all = res.responding || {};
-		res.official.forEach(add); res.thirdparty.forEach(add);
+		res.official.forEach(add);
+		stremio.emit('addons-list', res);
 	}).error(function(er) { console.error("add-ons tracker", er) });
 
 	// VERY important -  update the rootScope when a new add-on is ready
