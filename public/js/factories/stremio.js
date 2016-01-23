@@ -1,6 +1,6 @@
 
 // Initiate the client to the add-ons
-app.factory("stremio", ["$http", "$rootScope", function($http, $scope) {
+app.factory("stremio", ["$http", "$rootScope", function($http, $rootScope) {
 	var Stremio = require("stremio-addons");
 	var stremio = new Stremio.Client();
 
