@@ -71,12 +71,12 @@
 			<div class="col-xs-8">
 				<div class="row catalog" ng-repeat="group in groups">
 					<h2>{{group.type}}</h2>
-					<div ng-repeat="res in group.items" ng-if="res.poster" class="col-xs-4 col-lg-3 nopadding" >
-						<div class="panel" ng-class="res.id == selected.item.id ? 'panel-primary' : ''">
-							<a href="" ng-click="selected.item = res">
-								<img class="img-responsive" ng-src="{{formatImgURL(res.poster, 210, 300) || 'no-poster.jpg'}}" alt="{{res.name}}" />
+					<div ng-repeat="item in group.items" ng-if="::item.poster" class="col-xs-4 col-lg-3 nopadding" >
+						<div class="panel" ng-class="::item.id == selected.item.id ? 'panel-primary' : ''">
+							<a href="" ng-click="selected.item = item">
+								<img class="img-responsive" ng-src="{{::item.getPoster()}}" alt="{{::item.name}}" />
 							</a>
-							<a ng-cloak class="play-button" href="#" ng-show="res.id == selected.item.id">
+							<a ng-cloak class="play-button" href="#" ng-show="::item.id == selected.item.id">
 								<img src="play_circle.png" alt="Play"/>
 							</a>
 						</div>
@@ -108,12 +108,12 @@
 			</div>
 			<div class="col-xs-7">
 				<div class="row catalog" ng-show="items">
-					<div ng-repeat="res in items" ng-if="res.poster" class="col-xs-4 col-lg-3 nopadding" >
-						<div class="panel" ng-class="res.id == selected.item.id ? 'panel-primary' : ''">
-							<a href="" ng-click="selected.item = res">
-								<img class="img-responsive" ng-src="{{formatImgURL(res.poster, 210, 300) || 'no-poster.jpg'}}" alt="{{res.name}}" />
+					<div ng-repeat="item in items" ng-if="item.poster" class="col-xs-4 col-lg-3 nopadding" >
+						<div class="panel" ng-class="::item.id == selected.item.id ? 'panel-primary' : ''">
+							<a href="" ng-click="selected.item = item">
+								<img class="img-responsive" ng-src="{{::item.getPoster()}}" alt="{{::item.name}}" />
 							</a>
-							<a ng-cloak class="play-button" href="#" ng-show="res.id == selected.item.id">
+							<a ng-cloak class="play-button" href="#" ng-show="item.id == selected.item.id">
 								<img src="play_circle.png" alt="Play"/>
 							</a>
 						</div>

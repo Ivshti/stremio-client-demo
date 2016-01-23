@@ -16,16 +16,6 @@ app.run(['$rootScope', 'stremio', '$location', function($scope, stremio, $locati
 		tv: { name: 'TV channels' },
 	};
 
-	var IMDB_PROXY = '/poster/';
-	$scope.formatImgURL = function formatImgURL(url, width, height) {
-		if (!url || -1 === url.indexOf("imdb.com")) return url;
-
-		var splitted = url.split("/").pop().split(".");
-		if (1 === splitted.length) return url;
-
-		return IMDB_PROXY + encodeURIComponent(url.split("/").slice(0,-1).join("/") + "/" + splitted[0] + "._V1._SX" + width + "_CR0,0," + width + "," + height + "_.jpg");
-	};
-
 	// Activate ?addon=
 	var add = stremio.add.bind(stremio);
 	var addonUrl = $location.search().addon;
