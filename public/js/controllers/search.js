@@ -35,6 +35,7 @@ app.controller('searchCtrl', ['stremio', 'metadata', '$scope', function(stremio,
 			.sortBy(function(group) { return $scope.results.prio[group.type] })
 			.value();
 		$scope.noResults = $scope.searchQuery && (all.length == 0);
+		$scope.count = all.length;
 		$scope.selected.item = all[0];
 	};
 
@@ -42,6 +43,7 @@ app.controller('searchCtrl', ['stremio', 'metadata', '$scope', function(stremio,
 		$scope.searchQuery = ""; 
 		$scope.groups = [];
 		$scope.noResults = false;
+		$scope.count = 0;
 		$scope.selected.item = null;
 	};
 
