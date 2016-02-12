@@ -68,16 +68,25 @@ app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainCo
 		}).slice(0, $scope.selected.limit);
 		$scope.selected.item = $scope.items[0];
 
-		var limit = $scope.selected.limit;
-		if ( ($scope.items.length<limit && askedFor != limit) || sort != lastSort) stremio.meta.find({ 
-			query: _.pick(_.pick($scope.selected, "type", "genre"), _.identity),
-			limit: PAGE_LEN, skip: limit-PAGE_LEN,
-			sort: _.object([sort],[-1])
-		}, function(err, r, addon) {
-			askedFor = limit;
-			lastSort = sort;
-			receiveItems(err, r, addon);
-		});
+		if ( ($scope.items.length<limit && askedFor != limit) || sort != lastSort) {
+			var limit = $scope.selected.limit;
+			var args = { 
+				query: _.pick(_.pick($scope.selected, "type", "genre"), _.identity),
+				limit: PAGE_LEN, skip: limit-PAGE_LEN,
+				sort: _.object([sort],[-1])
+			};
+			var addons = stremio.get("meta.find", args);
+			var sortDesc = _.findWhere(stremio.sorts, { prop: sort });
+			
+			// Only get filter the add-ons that defined this sort
+			if (sortDesc && sortDesc.addon) addons = addons.filter(function(x) { return x.identifier() === sortDesc.addon });
+
+			stremio.fallthrough(addons, "meta.find", args, function(err, r, addon) {
+				askedFor = limit;
+				lastSort = sort;
+				receiveItems(err, r, addon);
+			});
+		}
 	});
 
 	$scope.isLoading = function() { return loading };

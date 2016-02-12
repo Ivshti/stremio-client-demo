@@ -33,10 +33,10 @@ app.factory("stremio", ["$http", "$rootScope", function($http, $rootScope) {
 	stremio.on("addon-ready", function(addon) {
 		// Old, LID-based sort
 		var lid = addon.manifest.stremio_LID;
-		if (lid) stremio.sorts.push({ name: addon.manifest.sortName || addon.manifest.name, prop: "popularities."+lid, types: addon.manifest.types });
+		if (lid) stremio.sorts.push({ name: addon.manifest.sortName || addon.manifest.name, prop: "popularities."+lid, types: addon.manifest.types, addon: addon.identifier() });
 		
 		// New .sorts property
-		if (Array.isArray(addon.manifest.sorts)) stremio.sorts = stremio.sorts.concat(addon.manifest.sorts);
+		if (Array.isArray(addon.manifest.sorts)) addon.manifest.sorts.forEach(function(s) { s.addon = addon.identifier(); stremio.sorts.push(s) });
 		
 		stremio.sorts = _.uniq(stremio.sorts, "prop");
 	})
