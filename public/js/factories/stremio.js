@@ -39,7 +39,7 @@ app.factory("stremio", ["$http", "$rootScope", function($http, $rootScope) {
 	
 	            // Old, LID-based sort
 	            var lid = stremio.LID = m.stremio_LID;
-	            if (lid) stremio.sorts.push({ name: m.sortName || m.name, prop: "popularities."+lid, types: addon.m.types, addon: addon.identifier() });
+	            if (lid) stremio.sorts.push({ name: m.sortName || m.name, prop: "popularities."+lid, types: m.types, addon: addon.identifier() });
 	
 	            // New, .sorts property
 	            if (Array.isArray(m.sorts)) m.sorts.forEach(function(s) { s.addon = addon.identifier(); stremio.sorts.push(s) });
