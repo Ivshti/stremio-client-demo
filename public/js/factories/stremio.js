@@ -31,14 +31,21 @@ app.factory("stremio", ["$http", "$rootScope", function($http, $rootScope) {
 	stremio.on("addon-ready", _.debounce(function() { !$rootScope.$phase && $rootScope.$apply() }, 300));
 
 	stremio.on("addon-ready", function(addon) {
-		// Old, LID-based sort
-		var lid = addon.manifest.stremio_LID;
-		if (lid) stremio.sorts.push({ name: addon.manifest.sortName || addon.manifest.name, prop: "popularities."+lid, types: addon.manifest.types, addon: addon.identifier() });
-		
-		// New .sorts property
-		if (Array.isArray(addon.manifest.sorts)) addon.manifest.sorts.forEach(function(s) { s.addon = addon.identifier(); stremio.sorts.push(s) });
-		
-		stremio.sorts = _.uniq(stremio.sorts, "prop");
+	        // Re-aggregate those always, so that we keep the same order as the add-ons
+	        stremio.sorts = [];
+	        stremio.get().forEach(function(addon) {
+	            var m = addon.manifest;
+	            if (!m) return;
+	
+	            // Old, LID-based sort
+	            var lid = stremio.LID = m.stremio_LID;
+	            if (lid) stremio.sorts.push({ name: m.sortName || m.name, prop: "popularities."+lid, types: addon.m.types, addon: addon.identifier() });
+	
+	            // New, .sorts property
+	            if (Array.isArray(m.sorts)) m.sorts.forEach(function(s) { s.addon = addon.identifier(); stremio.sorts.push(s) });
+	        });
+	
+	        stremio.sorts = _.uniq(stremio.sorts, "prop");
 	})
 
 	return stremio;
