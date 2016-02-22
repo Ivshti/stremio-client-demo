@@ -47,7 +47,7 @@ app.factory("stremio", ["$http", "$rootScope", function($http, $rootScope) {
 	            if (Array.isArray(m.sorts)) m.sorts.forEach(function(s) { s.addon = addon.identifier(); stremio.sorts.push(s) });
 	        
 	            // Types
-	            stremio.types = stremio.types.concat(m.types);
+	            stremio.types = stremio.types.concat(m.types || []);
 	        });
 	
 	        stremio.sorts = _.uniq(stremio.sorts, "prop");
