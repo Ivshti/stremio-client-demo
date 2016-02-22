@@ -32,7 +32,9 @@ app.factory("stremio", ["$http", "$rootScope", function($http, $rootScope) {
 
 	stremio.on("addon-ready", function(addon) {
 	        // Re-aggregate those always, so that we keep the same order as the add-ons
-	        stremio.sorts = [];
+	        stremio.sorts = []; 
+	        stremio.types = [];
+	        
 	        stremio.get().forEach(function(addon) {
 	            var m = addon.manifest;
 	            if (!m) return;
@@ -43,9 +45,13 @@ app.factory("stremio", ["$http", "$rootScope", function($http, $rootScope) {
 	
 	            // New, .sorts property
 	            if (Array.isArray(m.sorts)) m.sorts.forEach(function(s) { s.addon = addon.identifier(); stremio.sorts.push(s) });
+	        
+	            // Types
+	            stremio.types = stremio.types.concat(m.types);
 	        });
 	
 	        stremio.sorts = _.uniq(stremio.sorts, "prop");
+	        stremio.types = _.uniq(stremio.types);
 	})
 
 	return stremio;
