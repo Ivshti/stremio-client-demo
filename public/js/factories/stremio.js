@@ -4,7 +4,7 @@ app.factory("stremio", ["$http", "$rootScope", function($http, $rootScope) {
 	var Stremio = require("stremio-addons");
 	var stremio = new Stremio.Client();
 
-	stremio.sorts = [{ name: "Popularity", prop: "popularity" }];
+	stremio.sorts = [];
 
 	// Default auth token for open-source projects ; not required for stremioget end-points
 	stremio.setAuth("http://api9.strem.io", "2a240788ce82492744cdd42ca434fc26848ec616");
@@ -32,7 +32,7 @@ app.factory("stremio", ["$http", "$rootScope", function($http, $rootScope) {
 
 	stremio.on("addon-ready", function(addon) {
 	        // Re-aggregate those always, so that we keep the same order as the add-ons
-	        stremio.sorts = [{ name: "Popularity", prop: "popularity" }]; 
+	        stremio.sorts = []; 
 	        stremio.types = [];
 	        
 	        stremio.get().forEach(function(addon) {

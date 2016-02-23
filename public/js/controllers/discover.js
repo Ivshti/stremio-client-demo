@@ -2,7 +2,7 @@
 app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainController(stremio, $scope, metadata) {
 	var PAGE_LEN = 140;
 
-	$scope.selected = { type: "movie", genre: null, limit: PAGE_LEN, sort: stremio.sorts[0].prop }; // selected category, genre
+	$scope.selected = { type: "movie", genre: null, limit: PAGE_LEN, sort: null }; // selected category, genre
 	
 	var loading = true, genres = $scope.genres = { }, items = [];
 
@@ -42,10 +42,11 @@ app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainCo
 	// Reset sort
 	$scope.filterSort = function(type, x) { return !x.types || x.types.indexOf(type) > -1 };
 	var setSort = function() {
-		$scope.sorts = stremio.sorts;
-		$scope.selected.sort = stremio.sorts.filter($scope.filterSort.bind(null, $scope.selected.type)).pop().prop;
+		$scope.sorts = [{ name: "Popularity", prop: "popularity" }].concat(stremio.sorts.filter($scope.filterSort.bind(null, $scope.selected.type)));
+		$scope.sorts = _.uniq($scope.sorts, "prop");
+		$scope.selected.sort = $scope.sorts[$scope.sorts.length-1].prop;
 	};
-	$scope.$watchCollection("sorts", setSort);
+	$scope.$watchCollection(function() { return stremio.sorts }, setSort);
 	$scope.$watch("selected.type", setSort);
 
 	// Reset page on every change of type/genre/sort
