@@ -18,10 +18,10 @@ app.controller('infobarCtrl', ['stremio', '$scope', 'requests', function(stremio
 			}
 		});
 	});
-	$scope.$watch(function() { return $scope.selected.video || $scope.selected.item }, function() {
+	$scope.$watch(function() { return $scope.selected.item && $scope.selected.item.getQuery($scope.selected.video) }, function(query) {
 		$scope.handle = null;
 		if (! $scope.selected.item) return;
-		$scope.handle = requests.candidates({ query: $scope.selected.item.getQuery($scope.selected.video) }).on("updated", delayedDigest);
+		$scope.handle = requests.candidates({ query: query }).on("updated", delayedDigest);
 	}, true);
 
 
