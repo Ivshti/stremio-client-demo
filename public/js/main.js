@@ -23,5 +23,5 @@ app.run(['$rootScope', 'stremio', '$location', function($scope, stremio, $locati
 	if (addonUrl) add(addonUrl);
 
 	// Activate third-party add-ons
-	stremio.on('addons-list', function(res) { res.thirdparty.forEach(add) });
+	if (!$location.search().nothirdparty) stremio.on('addons-list', function(res) { res.thirdparty.forEach(add) });
 }]);
