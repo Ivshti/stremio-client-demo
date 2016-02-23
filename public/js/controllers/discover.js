@@ -67,7 +67,7 @@ app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainCo
 			return (x.type == $scope.selected.type) && 
 				(!$scope.selected.genre || (x.genre && x.genre.indexOf($scope.selected.genre) > -1))
 		}).slice(0, $scope.selected.limit);
-		$scope.selected.item = $scope.items[0];
+		//$scope.selected.item = $scope.items[0];
 
 		if ( ($scope.items.length<limit && askedFor != limit) || sort != lastSort) {
 			var limit = $scope.selected.limit;
