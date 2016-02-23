@@ -50,9 +50,9 @@ app.factory("stremio", ["$http", "$rootScope", function($http, $rootScope) {
 	            stremio.types = stremio.types.concat(m.types || []);
 	        });
 	
-	        stremio.sorts = _.uniq(stremio.sorts, "prop");
+	        stremio.sorts = _.uniq(stremio.sorts, function(x) { return x.addon+":"+x.prop });
 	        stremio.types = _.uniq(stremio.types);
-	})
+	});
 
 	return stremio;
 }]);
