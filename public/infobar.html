@@ -37,36 +37,39 @@
 			</td></tr>
 		</table>
 
-		<h3 class="text-uppercase" ng-if="handle.candidates">Streams</h3>
-		<table class="table table-borderless streams-table" ng-repeat="stream in handle.candidates">
-			<tr>
+		<div class='streams-holder'>
+			<h3 class="text-uppercase" ng-if="handle.candidates">Streams</h3>
+			<table class="table table-borderless streams-table" ng-repeat="stream in handle.candidates">
+				<tr>
 
-				<td>
-					<!-- stream name - usually the add-on name -->
-					<div>{{streamName(stream)}}</div>
+					<td>
+						<!-- stream name - usually the add-on name -->
+						<div>{{streamName(stream)}}</div>
 
-					<!-- stream title ; if it's pay-per-watch, then this will contain the price -->
-					<div>{{stream.title}}</div>
+						<!-- stream title ; if it's pay-per-watch, then this will contain the price -->
+						<div>{{stream.title}}</div>
 
-					<!-- if it's a free stream, subscription stream, etc. -->
-					<div ng-if="stream.hasOwnProperty('isSubscription') || stream.hasOwnProperty('isFree')">{{stream.isSubscription ? 'subscription' : (stream.isFree ? 'free' : '')}}</div>
+						<!-- if it's a free stream, subscription stream, etc. -->
+						<div ng-if="stream.hasOwnProperty('isSubscription') || stream.hasOwnProperty('isFree')">{{stream.isSubscription ? 'subscription' : (stream.isFree ? 'free' : '')}}</div>
 
-					<!-- tags: like sd, hd, low, 1080p, 4k; could contain source too, like netflix, hulu -->
-					<div class='tags streams-tags'>Tags: {{stream.tag.join(", ")}}</div>
+						<!-- tags: like sd, hd, low, 1080p, 4k; could contain source too, like netflix, hulu -->
+						<div class='tags streams-tags'>Tags: {{stream.tag.join(", ")}}</div>
 
-					<!-- various type sof links to the stream; video link, external link, youtube link, bittorrent link -->
-					<div class="link" ng-show="stream.url"><a target="_blank" ng-href="{{stream.url}}">video link to {{stream.url.split("/")[2]}}</a></div>
+						<!-- various type sof links to the stream; video link, external link, youtube link, bittorrent link -->
+						<div class="link" ng-show="stream.url"><a target="_blank" ng-href="{{stream.url}}">video link to {{stream.url.split("/")[2]}}</a></div>
 
-					<div class="link" ng-show="stream.externalUrl"><a target="_blank" ng-href="{{stream.externalUrl}}">external link to {{stream.externalUrl.split("/")[2]}}</a></div>
+						<div class="link" ng-show="stream.externalUrl"><a target="_blank" ng-href="{{stream.externalUrl}}">external link to {{stream.externalUrl.split("/")[2]}}</a></div>
 
-					<div class="link" ng-show="stream.yt_id"><a target="_blank" ng-href="http://youtube.com/watch?v={{stream.yt_id}}">link to YouTube</a></div>
+						<div class="link" ng-show="stream.yt_id"><a target="_blank" ng-href="http://youtube.com/watch?v={{stream.yt_id}}">link to YouTube</a></div>
 
-					<div class="link" ng-show="stream.infoHash"><a target="_blank" ng-href="magnet:?xt=urn:btih:{{stream.infoHash}}">magnet to {{stream.infoHash}} {{stream.hasOwnProperty('mapIdx') ? ' / '+stream.mapIdx : ''}}</a></div>
+						<div class="link" ng-show="stream.infoHash"><a target="_blank" ng-href="magnet:?xt=urn:btih:{{stream.infoHash}}">magnet to {{stream.infoHash}} {{stream.hasOwnProperty('mapIdx') ? ' / '+stream.mapIdx : ''}}</a></div>
 
-				</td>
+					</td>
 
-			</tr>
+				</tr>
 
-		</table>
+			</table>
+		</div>
+
 	</div>
 </div>

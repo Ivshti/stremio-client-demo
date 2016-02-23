@@ -91,6 +91,7 @@ h3{
 	padding: 0;
 }
 
+.streams-holder { height: 400px; overflow-y: auto; }
 .streams-table a { font-size: 11px; }
 .streams-tags { font-size: 12px;}
 
