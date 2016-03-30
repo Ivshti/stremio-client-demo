@@ -2,7 +2,12 @@
 // Metadata model
 var useAsId = ["imdb_id", "yt_id", "filmon_id"];
 app.factory('metadata', ['$sce', function($sce) {
-	return function metadata(meta) {
+	function getIdFromStr(str) {
+		if (str.match("^tt")) return { imdb_id: str };
+		if (str.match(":")) return _.object([ str.split(":")[0] ], [ str.split(":")[1] ]); // generic
+	}
+
+	function metadata(meta) {
 		var self = this;
 		_.extend(self, meta);
 
@@ -17,11 +22,6 @@ app.factory('metadata', ['$sce', function($sce) {
 		};
 		Object.defineProperty(self, "id", { enumerable: true, get: getId });
 		Object.defineProperty(self, "_id", { enumerable: true, get: getId });
-		
-		var getIdFromStr = function(str) {
-			if (str.match("^tt")) return { imdb_id: str };
-			if (str.match(":")) return _.object([ str.split(":")[0] ], [ str.split(":")[1] ]); // generic
-		}
 
 		// this gets passed to stream.find add-on method
 		self.getQuery = function(extra) {
@@ -51,4 +51,8 @@ app.factory('metadata', ['$sce', function($sce) {
 			);
 		};
 	};
+
+	metadata.getIdFromStr = getIdFromStr;
+
+	return metadata;
 }]);
