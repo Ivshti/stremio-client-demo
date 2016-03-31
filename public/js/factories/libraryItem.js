@@ -30,7 +30,23 @@ function libraryItem(meta) {
             : { type: self.type });
     };
 
-    // self.title
+    self.title = function(meta) {
+        var subtitle = "";
+        if (this.type == "series" && this.state.season) subtitle = ("season "+this.state.season+", episode "+this.state.episode);
+        if (this.type == "series" && meta && Array.isArray(meta.episodes)) {
+            var ep = meta.getEpisode(this.state.season, this.state.episode);
+            if (ep) subtitle = ep.name + " ("+this.state.season+"x"+this.state.episode+")";
+        };
+        if (this.type == "channel" && meta && Array.isArray(meta.uploads)) {
+            var vid = meta.getVideo(this.state.video_id);
+            if (vid) subtitle = vid.title;
+        };
+        
+        // if (!subtitle && notif && notif.title) subtitle = notif.title;
+
+        return this.name + ( subtitle ? " - "+subtitle : "")
+    };
+
     // self.metaQuery
 
 };
