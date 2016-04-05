@@ -21,6 +21,10 @@ function libraryItem(meta) {
         if (self.type=="channel") return [self._id, self.state.video_id].join(" ");
         return (self.type == "series") ? [self._id, self.state.season, self.state.episode].join(" ") : self._id
     };
+    
+    self.getQuery = function() {
+        return _.extend({ type: this.type }, metadata.getIdFromStr(this._id));
+    }
 
     self.requestQuery = function() {
         if (self.type=="channel") return { yt_id: self.state.video_id, type: "channel" };
