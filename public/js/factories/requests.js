@@ -30,6 +30,7 @@ app.factory("requests", ["stremio", function(stremio) {
 				add((Array.isArray(resp) ? resp : []).filter(function(x) { return x }).map(function(x) { 
 					x.addon = addon;
 					x._id = x.infoHash + (x.hasOwnProperty('mapIdx') ? '/'+x.mapIdx : '') || x.url || x.externalUrl || x.yt_id; /// for _.uniq
+					x.availability = x.hasOwnProperty('availability') ? x.availability : 1;
 					return x;
 				}));
 			}));
