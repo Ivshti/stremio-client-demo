@@ -44,8 +44,8 @@ app.factory('metadata', ['$sce', function($sce) {
 			}
 	
 			if (! (url && url.match("imdb.com"))) return url;
-				var splitted = url.split("@@");
-				if (splitted.length == 2) {
+			var splitted = url.split("@@");
+			if (splitted.length == 2) {
 				return self.proxyImdbPoster((splitted[0]+"@@._V1._SX"+width+"_CR0,0,"+width+","+(height || "")+"_.jpg") || "");
 			}
 			// WARNING: can the upper code be re-used?
@@ -53,7 +53,7 @@ app.factory('metadata', ['$sce', function($sce) {
 			if (splitted.length == 2) {
 				return self.proxyImdbPoster(splitted[0] + "@._V1_SX"+width+".jpg");
 			}
-			return url;			
+			return url;	
 		};
 		
 		self.proxyImdbPoster = function(url) {
