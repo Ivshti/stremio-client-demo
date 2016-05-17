@@ -32,14 +32,32 @@ app.factory('metadata', ['$sce', function($sce) {
 		};
 
 		self.getPoster = function() {
-			//console.log(this.fanart) // TODO
-			var url = this.poster;
-			if (! url) return url;
-			if (! url.match(/imdb/)) return url;
-			var width = 210, height = 300; // TODO: respect size
+			var width = 210, height = 300;
 			//var width = 200, height = 296;
-			var poster = (url.split("@@")[0]+"@@"+"._V1._SX" + width + "_CR0,0," + width + "," + height + "_.jpg");
-			return (window.location.hostname == "localhost" || window.cordova) ? poster : "/poster/"+encodeURIComponent(poster);
+			return self.resizePoster(this.poster, width, height);
+		};
+		
+		self.resizePoster = function(url, width, heigth) {
+			if (url.match("fanart.tv")) {
+				if (width < 500) return url.replace(/(assets.)?fanart.tv\/fanart\//, "fanart.tv/detailpreview/fanart/");
+				else return url;
+			}
+	
+			if (! (url && url.match("imdb.com"))) return url;
+				var splitted = url.split("@@");
+				if (splitted.length == 2) {
+				return self.proxyImdbPoster((splitted[0]+"@@._V1._SX"+width+"_CR0,0,"+width+","+(height || "")+"_.jpg") || "");
+			}
+			// WARNING: can the upper code be re-used?
+			splitted = url.split("@");
+			if (splitted.length == 2) {
+				return self.proxyImdbPoster(splitted[0] + "@._V1_SX"+width+".jpg");
+			}
+			return url;			
+		};
+		
+		self.proxyImdbPoster = function(url) {
+			return (window.location.hostname == "localhost" || window.cordova) ? url : "/poster/"+encodeURIComponent(url);
 		};
 
 		self.descriptionHTML = function() { 
