@@ -37,7 +37,7 @@ app.factory('metadata', ['$sce', function($sce) {
 			return self.resizePoster(this.poster, width, height);
 		};
 		
-		self.resizePoster = function(url, width, heigth) {
+		self.resizePoster = function(url, width, height) {
 			if (url.match("fanart.tv")) {
 				if (width < 500) return url.replace(/(assets.)?fanart.tv\/fanart\//, "fanart.tv/detailpreview/fanart/");
 				else return url;
