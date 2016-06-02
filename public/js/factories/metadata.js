@@ -1,6 +1,6 @@
 
 // Metadata model
-var useAsId = ["imdb_id", "yt_id", "filmon_id"];
+var useAsId = ["imdb_id", "yt_id", "filmon_id", "twitch_id"];
 app.factory('metadata', ['$sce', function($sce) {
 	function getIdFromStr(str) {
 		if (str.match("^tt")) return { imdb_id: str };
