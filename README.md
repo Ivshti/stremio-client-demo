@@ -3,7 +3,7 @@ An example client to the Stremio add-ons protocol, similar to Stremio's Discover
 ![Stremio add-ons client](/screenshots/stremio-addons-client.png)
 
 ## What's this?
-It's an example client of the [stremio-addons](http://github.com/Stremio/stremio-addons) system (which is a multi-client RPC lib). 
+It's an example client of the [stremio-addons](http://github.com/Stremio/stremio-addons) system, which is the glue between Stremio and the add-ons. 
 It mimics Stremio's Discover interface, and shows all available streams gathered from all add-ons for a selected movie/series/channel/etc.
 
 **The main purpose of this is to aid developers in creating their own Stremio add-on by showing them how the actual app(s) utilize the add-on client.**
@@ -25,7 +25,7 @@ npm start
 
 That means either adding items to Discover or providing sources to stream content farom.
 
-Unlike regular software plugins, Stremio addons **do not run inside Stremio**, but instead are **accessed through HTTP over network**. You can think of them as **RSS on steroids**. Multiple addons can be activated, providing you more content, without installation or security risks.
+Unlike regular software plugins, Stremio addons **do not run inside Stremio**, but instead are **hosted separately accessed through HTTP over network**. You can think of them as **RSS on steroids**. Multiple addons can be enabled, providing you more content, without installation or security risks.
 
 
 ## Does it use the same logic as the desktop app?
