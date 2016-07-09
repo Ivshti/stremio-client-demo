@@ -38,13 +38,13 @@ Unlike regular software plugins, Stremio addons **do not run inside Stremio**, b
 
 ## Can I see example add-ons?
 
+[Hello World add-on](https://github.com/Ivshti/addon-helloworld)
+
+[Vodo add-on](https://github.com/Ivshti/stremio-vodo)
+
 [Guidebox add-on](http://github.com/Stremio/guidebox-stremio)
 
 [Filmon.tv add-on](http://github.com/Stremio/filmon-stremio)
-
-[Hello World add-on](https://github.com/Ivshti/addon-helloworld)
-
-Coming soon: public domain movies, YouTube channels
 
 You can see all known hosted Stremio add-ons at [addons.strem.io](http://addons.strem.io)
 
