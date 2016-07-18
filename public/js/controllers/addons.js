@@ -10,7 +10,7 @@ app.controller('addonsCtrl', ['stremio', '$scope', function(stremio, $scope) {
 	};
 
 	$scope.add = function() {
-		stremio.add($scope.addonUrl);
+		stremio.addUrl($scope.addonUrl);
 		$scope.addonUrl = "";
 	}
 

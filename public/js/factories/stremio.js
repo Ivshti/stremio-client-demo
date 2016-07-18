@@ -6,15 +6,13 @@ app.factory("stremio", ["$http", "$rootScope", function($http, $rootScope) {
 
 	stremio.sorts = [];
 
-	// Default auth token for open-source projects ; not required for stremioget end-points
-	stremio.setAuth("http://api9.strem.io", "2a240788ce82492744cdd42ca434fc26848ec616");
-
 	// Hardcode default official Stremio add-ons - Cinemeta (IMDB metadata), Guidebox (iTunes/Hulu/Netflix/etc. links), Channels (YouTube), Filmon
 	stremio.official = ["http://cinemeta.strem.io/stremioget", "http://guidebox.strem.io/stremioget", "http://channels.strem.io/stremioget", "http://filmon.strem.io/stremioget"];
 	stremio.thirdparty = [];
 	stremio.all = {};
 
-	var add = stremio.add.bind(stremio);
+	var add = function(x) { stremio.add(x.match('/stremio/v1') ? x : x+'/stremio/v1') };
+	stremio.addUrl = add;
 
 	stremio.official.forEach(add);
 
