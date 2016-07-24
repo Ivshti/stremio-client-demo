@@ -8,92 +8,129 @@ app.controller('discoverCtrl', ['stremio', '$scope', 'metadata', function mainCo
 
 	var delayedApply = _.debounce(function() { !$scope.$phase && $scope.$apply() }, 300);
 
-	// Get all supported types of the stremio addons client - e.g. movie, series, channel
-	function receiveItems(err, r, addon) {
-		if (err) console.error(err);
-		if (!r) return;
+	// Genres list
+	var updateGenresFromAddons = _.debounce(function() {
+		Object.keys(stremio.supportedTypes).forEach(function(type) {
+			stremio.meta.find({ 
+				query: { type: type }, complete: true, popular: true,
+				limit: 300, projection: { type: 1, genre:1 /*, popularity: 1*/ }
+			}, function(err, res) { if (res) res.forEach(addCategories); delayedApply(); });
+		});
+	});
+
+	$scope.$watchCollection(function() { return Object.keys(stremio.supportedTypes).sort() }, _.debounce(function() {
+		if (!_.isEmpty(stremio.supportedTypes)) updateGenresFromAddons();
+	}));
+
+    $scope.genres = { }; // genres by type
+
+    // Categories
+    var addCategories = function(meta) {
+        if (! $scope.genres[meta.type]) $scope.genres[meta.type] = { };
+        if (meta.genre) meta.genre.forEach(function(g) { $scope.genres[meta.type][g] = true });
+
+        // WARNING: meta.categories can also be used for items which have .genre; we'll clutter the UI though
+    };
+
+	// Sorts
+	var defaultSorts = [
+		{ prop: null, name: "SORT_TRENDING" },
+		{ prop: "imdbRating", name: "SORT_RATING", types: ["movie", "series"], addon: "com.linvo.cinemeta" },
+		{ prop: "name", name: "SORT_ALPHABET", types: ["movie", "series"], addon: "com.linvo.cinemeta" },
+		{ prop: "released", name: "SORT_YEAR", types: ["movie", "series"], addon: "com.linvo.cinemeta" }
+		// consider year
+	];
+	$scope.sorts = [].concat(defaultSorts); // we set it on updateSelected
+
+	$scope.$watchCollection(function() { return stremio.sorts.map(function(x) { return x.prop }) }, function() {
+		$scope.sorts = _.uniq(stremio.sorts.concat(defaultSorts), "prop");
+		//if (!$scope.selected.userSetSort) $scope.selected.sort = $scope.sorts.filter($scope.supportSort)[0].prop;
+	});
+
+	$scope.supportSort = function(sort) {
+		if (!sort) return false;
+		if (sort.noDiscoverTab) return false;
+		return !sort.types || sort.types.indexOf($scope.selected.type) > -1;
+	}
+
+	/* 
+	 * Main query & catalogue retrieval
+	 */
+	var asked, loaded;
+	$scope.$watch("selected", function(selected) {
+		if (! selected) return;
+
+		if ($scope.loading) return;
+
+		$scope.loading = true;
+		$scope.items = { }; // Reset list, UX touch
+
+		//userSetItem = false;
+		loaded = 0; asked = 0;
+
+		// Build query
+		var sort = selected.sort || "popularity";
+		var q = {
+			query: { type: selected.type },
+			popular: true, complete: true,
+			sort: _.object([ sort ], [ -1 ]),
+			limit: 70, skip: selected.loaded,
+		};
 		
-		delayedApply();
+		if (selected.genre == "oscar") q.query.awards = { oscar: 1 }; // oscar winners special case
+		else if (selected.genre) q.query.genre = selected.genre;
+		
+		if (sort.match("^popularities")) q.query[selected.sort] = { $gt: 0 }; // only popular items
+		if (sort.match("popularity")) q.query.poster = { $nin: [null, "", "N/A"] }; // default sort, add that to query; LEGACY
+		if (sort.match("released")) { q.limit = 420; q.sort = { "popularities.moviedb": -1 } }; // year-based sort, show movies for a lot of years
 
-		// Same message as Desktop app
-		console.log("Discover pulled "+r.length+" items from "+(addon && addon.url));
-
-		var m = _.indexBy(items, "id");
-		r.forEach(function(x) { var meta = new metadata(x); m[meta.id] = meta });
-		items = _.values(m);
-		items.forEach(function(x) { 
-			if (! genres[x.type]) genres[x.type] = { };
-			if (x.genre) x.genre.forEach(function(g) { genres[x.type][g] = 1 });
+		// Pick add-ons
+		var addons = stremio.get("meta.find", q);
+		$scope.sorts.forEach(function(s) {
+			if ((!s.types || s.types.indexOf(selected.type) > -1) && s.prop === sort && s.addon) {
+				addons = addons.filter(function(x) { return x.identifier() === s.addon })
+			}
 		});
-	};
 
-	// Load initial data for each type
-	var types = [], i = 0;
-	$scope.$watch(function() { return types = Object.keys(stremio.supportedTypes).sort() }, _.debounce(function() {
-		types.forEach(function(type) {
-			// Query for each type - the add-ons client will automagically decide which add-on to pick for each type
-			stremio.meta.find({ query: { type: type }, limit: PAGE_LEN, skip: 0, complete: true, popular: true, projection: "lean" }, function(err, r, addon) {
-				if (++i == types.length) loading = false;
-				receiveItems(err, r, addon);
-			});
-		});
-	}, 500), true);
+		//if (addons[0] && addons[0].manifest.countrySpecific && stremio.countryCode) q.countryCode = stremio.countryCode.toLowerCase();
 
-	// Reset sort
-	$scope.filterSort = function(type, x) { return !x.types || x.types.indexOf(type) > -1 };
-	var setSort = function() {
-		$scope.sorts = [{ name: "Popularity", prop: "popularity" }].concat(stremio.sorts.filter($scope.filterSort.bind(null, $scope.selected.type)));
-		$scope.sorts = _.uniq($scope.sorts, "prop");
-		$scope.selected.sort = $scope.sorts[$scope.sorts.length-1].prop;
-	};
-	$scope.$watchCollection(function() { return stremio.sorts }, setSort);
-	$scope.$watch("selected.type", setSort);
+		var all = [ ];
 
-	// Reset page on every change of type/genre/sort
-	var askedFor, lastSort
-	$scope.$watchCollection(function() { return [$scope.selected.type, $scope.selected.genre, $scope.selected.sort, stremio.sorts.length] }, function() {
-		$scope.selected.limit = PAGE_LEN;
-		askedFor = PAGE_LEN;
-	});
+		$scope.loading = true; // WARNING: for now, we only set that on initial load; it's not good UX to set it when loading more items
+		requestRes();
+	
+		$scope.loadNextPage = function() {
+			if ($scope.selected.sort && !$scope.selected.sort.match("^popularit")) return; // no infinite scroll for non-popularity/popularities props
+			if (asked > loaded) return; // no more to ask for
+			requestRes();
+		};
 
-	// Update displayed items, load more items
-	$scope.$watchCollection(function() { return [$scope.selected.type, $scope.selected.genre, $scope.selected.sort, $scope.selected.limit, items.length] }, function() {		
-		var sort = $scope.selected.sort;
+		function requestRes() {
+			q.skip = loaded;
+			asked = loaded + 70;
+			stremio.fallthrough([].concat(addons), "meta.find", q, receiveRes);
+		};
 
-		$scope.items = _.sortBy(items, function(item) {
-			return -(sort.match("popularities") ? (item.popularities && item.popularities[sort.split(".")[1]]) : item[sort]) // descending
-		})
-		.filter(function(x) {
-			return (x.type == $scope.selected.type) && 
-				(!$scope.selected.genre || (x.genre && x.genre.indexOf($scope.selected.genre) > -1))
-		}).slice(0, $scope.selected.limit);
-		//$scope.selected.item = $scope.items[0];
+		function receiveRes(err, res, service) {
+			if (Array.isArray(res)) {
+				console.log("Discover pulled "+res.length+" from "+service.identifier()+" (first pick "+addons[0].identifier()+") for type "+q.query.type);
+				res = res.map(function(m) { return new metadata(m) });
+				all = _.uniq(all.concat(res), "_id");
+				loaded = all.length;
 
-		if ( ($scope.items.length<limit && askedFor != limit) || sort != lastSort) {
-			var limit = $scope.selected.limit;
-			var args = { 
-				query: _.pick(_.pick($scope.selected, "type", "genre"), _.identity),
-				limit: PAGE_LEN, skip: limit-PAGE_LEN,
-				sort: _.object([sort],[-1])
-			};
-			var addons = stremio.get("meta.find", args);
-			var sortDesc = _.findWhere(stremio.sorts, { prop: sort });
-			
-			// Only get filter the add-ons that defined this sort
-			if (sortDesc && sortDesc.addon) addons = addons.filter(function(x) { return x.identifier() === sortDesc.addon });
+				//$scope.items = groupResults(selected, all);
+				$scope.items = all;
 
-			stremio.fallthrough(addons, "meta.find", args, function(err, r, addon) {
-				askedFor = limit;
-				lastSort = sort;
-				receiveItems(err, r, addon);
-			});
+				//if (!sc) $scope.info = (all[0] && all[0].tvguide_short) ? null : all[0];
+			}
+
+			$scope.loading = false;
+			delayedApply();
 		}
-	});
+	}, true);
 
-	$scope.isLoading = function() { return loading };
-
-	$scope.loadNextPage = function() {
-		$scope.selected.limit += PAGE_LEN;
+	$scope.selectItem = function(item) {
+		$scope.selectedItem = item;
 	}
 
 	return self;

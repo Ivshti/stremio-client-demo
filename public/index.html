@@ -72,11 +72,11 @@
 				<div class="row catalog" ng-repeat="group in groups">
 					<h2>{{group.type}}</h2>
 					<div ng-repeat="item in group.items" ng-if="::item.poster" class="col-xs-4 col-lg-3 nopadding" >
-						<div class="panel" ng-class="::item.id == selected.item.id ? 'panel-primary' : ''">
-							<a href="" ng-click="selected.item = item">
+						<div class="panel" ng-class="::item.id == selectedItem.id ? 'panel-primary' : ''">
+							<a href="" ng-click="selectItem(item)">
 								<img class="img-responsive" ng-src="{{::item.getPoster()}}" alt="{{::item.name}}" />
 							</a>
-							<a ng-cloak class="play-button" href="#" ng-show="item.id == selected.item.id">
+							<a ng-cloak class="play-button" href="#" ng-show="item.id == selectedItem.id">
 								<img src="play_circle.png" alt="Play"/>
 							</a>
 						</div>
@@ -84,7 +84,7 @@
 				</div>
 			</div>
 
-			<div class="col-xs-4" style="margin-top: 30px;" ng-show="selected.item" ng-controller='infobarCtrl' ng-include="'infobar.html'">
+			<div class="col-xs-4" style="margin-top: 30px;" ng-show="selectedItem" ng-controller='infobarCtrl' ng-include="'infobar.html'">
 			</div>
 		</div>
 
@@ -98,7 +98,7 @@
 				</ul>
 				<br>
 				<ul class="nav nav-pills nav-stacked cat-types">
-					<li ng-repeat="sort in sorts track by $id(sort.prop)" ng-class="{'active': selected.sort === sort.prop}" ng-show="filterSort(selected.type, sort)"><a href="" ng-click="selected.sort = sort.prop">Sort by {{sort.name}}</a></li>
+					<li ng-repeat="sort in sorts track by $id(sort.prop)" ng-class="{'active': selected.sort === sort.prop}" ng-show="supportSort(sort)"><a href="" ng-click="selected.sort = sort.prop">Sort by {{sort.name}}</a></li>
 				</ul>
 				<br>
 				<ul class="nav nav-pills nav-stacked cat-genres">
@@ -109,26 +109,26 @@
 			<div class="col-xs-7">
 				<div class="row catalog" ng-show="items">
 					<div ng-repeat="item in items" ng-if="item.poster" class="col-xs-4 col-lg-3 nopadding" >
-						<div class="panel" ng-class="::item.id == selected.item.id ? 'panel-primary' : ''">
-							<a href="" ng-click="selected.item = item">
+						<div class="panel" ng-class="::item.id == selectedItem.id ? 'panel-primary' : ''">
+							<a href="" ng-click="selectItem(item)">
 								<img class="img-responsive" ng-src="{{::item.getPoster()}}" alt="{{::item.name}}" />
 							</a>
-							<a ng-cloak class="play-button" href="#" ng-show="item.id == selected.item.id">
+							<a ng-cloak class="play-button" href="#" ng-show="item.id == selectedItem.id">
 								<img src="play_circle.png" alt="Play"/>
 							</a>
 						</div>
 					</div>
 					<button class="btn btn-purple" style="display: block; width: 100%;" ng-show="items.length" ng-click="loadNextPage()">Load more items</button>
 				</div>
-				<div ng-show="isLoading()">
+				<div ng-show="loading">
 					<p><i class="fa fa-cog fa-spin"></i> Loading...</p>
 				</div>
-				<div ng-hide="items.length || isLoading()">
+				<div ng-hide="items.length || loading">
 					<p>No items to display</p>
 				</div>
 			</div>
 
-			<div class="col-xs-3" ng-show="selected.item" ng-controller='infobarCtrl' ng-include="'infobar.html'">
+			<div class="col-xs-3" ng-show="selectedItem" ng-controller='infobarCtrl' ng-include="'infobar.html'">
 			</div>
 		</div>
 	</div>

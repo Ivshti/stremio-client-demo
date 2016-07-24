@@ -1,39 +1,39 @@
 <div class="panel panel-default movie-info affix">
 	<div class="panel-body" style="position: relative; font-size: 13px;">
-		<h2 class="text-uppercase"> {{selected.item.name}}</h2>
+		<h2 class="text-uppercase"> {{selectedItem.name}}</h2>
 		<ul class="list-inline">
-			<li ng-repeat-start="(id, genre) in selected.item.genre" ng-show="id" role="separator">|</li>
+			<li ng-repeat-start="(id, genre) in selectedItem.genre" ng-show="id" role="separator">|</li>
 			<li ng-repeat-end>{{genre}}</li>
 		</ul>
 		<table class="table table-borderless">
 			<tr>
-				<th ng-show="selected.item.imdbRating" class="text-uppercase">IMDB</th>
-				<th ng-show="selected.item.year" class="text-uppercase">Year</th>
-				<th ng-show="selected.item.director" class="text-uppercase">Director</th>
+				<th ng-show="selectedItem.imdbRating" class="text-uppercase">IMDB</th>
+				<th ng-show="selectedItem.year" class="text-uppercase">Year</th>
+				<th ng-show="selectedItem.director" class="text-uppercase">Director</th>
 			</tr>
 			<tr class="sidebar-values">
-				<td ng-if="selected.item.imdbRating">
-					{{selected.item.imdbRating}}
+				<td ng-if="selectedItem.imdbRating">
+					{{selectedItem.imdbRating}}
 				</td>
-				<td ng-if="selected.item.year">{{selected.item.year}}</td>
-				<td ng-if="selected.item.director">
-					{{selected.item.director.join(', ')}}
+				<td ng-if="selectedItem.year">{{selectedItem.year}}</td>
+				<td ng-if="selectedItem.director">
+					{{selectedItem.director.join(', ')}}
 				</td>
 			</tr>
 		</table>
 
 		<h3 class="text-uppercase">Popularity</h3>
-		<p>{{selected.sort.match("popularities") ? selected.item.popularities[selected.sort.split(".")[1]] : selected.item[selected.sort]}}</p>
+		<p>{{selected.sort.match("popularities") ? selectedItem.popularities[selected.sort.split(".")[1]] : selectedItem[selected.sort]}}</p>
 		
-		<h3 class="text-uppercase" ng-if="selected.item.cast">Lead actors</h3>
-		<p>{{selected.item.cast.join(', ')}}</p>
-		<h3 class="text-uppercase" ng-if="selected.item.description">Summary</h3>
-		<p>{{selected.item.description}}</p>
+		<h3 class="text-uppercase" ng-if="selectedItem.cast">Lead actors</h3>
+		<p>{{selectedItem.cast.join(', ')}}</p>
+		<h3 class="text-uppercase" ng-if="selectedItem.description">Summary</h3>
+		<p>{{selectedItem.description}}</p>
 
 
 		<table class="table table-borderless">
-			<tr><td ng-show="selected.item.uploads || selected.item.episodes">
-				<select ng-model="selected.video" ng-options="item as getVidName(item) for item in (selected.item.uploads || selected.item.episodes)"></select>
+			<tr><td ng-show="selectedItem.uploads || selectedItem.episodes">
+				<select ng-model="selected.video" ng-options="item as getVidName(item) for item in (selectedItem.uploads || selectedItem.episodes)"></select>
 			</td></tr>
 		</table>
 
