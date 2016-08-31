@@ -29,7 +29,10 @@ function myRPCClient(endpoint) {
 // Initiate the client to the add-ons
 app.factory("stremio", ["$http", "$rootScope", function($http, $rootScope) {
 	var Stremio = require("stremio-addons");
-	var stremio = new Stremio.Client({ client: myRPCClient });
+	var stremio = new Stremio.Client({ 
+		// you can use your own RPC client, in case you prefer to use something specific to your environment (E.g. nativescript, react native, qml)
+		//client: myRPCClient 
+	});
 
 	stremio.sorts = [];
 
