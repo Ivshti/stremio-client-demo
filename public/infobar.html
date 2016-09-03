@@ -32,8 +32,8 @@
 
 
 		<table class="table table-borderless">
-			<tr><td ng-show="selectedItem.uploads || selectedItem.episodes">
-				<select ng-model="selected.video" ng-options="item as getVidName(item) for item in (selectedItem.uploads || selectedItem.episodes)"></select>
+			<tr><td ng-show="selectedItem.uploads || selectedItem.videos || selectedItem.episodes">
+				<select ng-model="selected.video" ng-options="item as getVidName(item) for item in (selectedItem.uploads || selectedItem.videos || selectedItem.episodes)"></select>
 			</td></tr>
 		</table>
 
