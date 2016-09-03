@@ -17,7 +17,7 @@ app.run(['$rootScope', 'stremio', '$location', function($scope, stremio, $locati
 	};
 
 	// Activate ?addon=
-	var add = stremio.add.bind(stremio);
+	var add = stremio.addUrl.bind(stremio);
 	var addonUrl = $location.search().addon;
 	if (addonUrl) console.log("Adding add-on "+addonUrl);
 	if (addonUrl) add(addonUrl);
